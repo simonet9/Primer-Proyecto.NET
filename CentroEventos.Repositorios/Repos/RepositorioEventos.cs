@@ -16,7 +16,7 @@ namespace CentroEventos.Repositorios.Repos
             context.SaveChanges();
         }
 
-        public EventoDeportivo? BuscarPorId(int id)
+        public EventoDeportivo? BuscarPorId(Guid id)
         {
             using var context = new MyContext();
             return context.EventosDeportivos.Find(id);
@@ -35,7 +35,7 @@ namespace CentroEventos.Repositorios.Repos
             context.SaveChanges();
         }
 
-        public void Eliminar(int id)
+        public void Eliminar(Guid id)
         {
             using var context = new MyContext();
             var evento = context.EventosDeportivos.Find(id);
@@ -56,7 +56,7 @@ namespace CentroEventos.Repositorios.Repos
                 .ToList();
         }
 
-        public List<EventoDeportivo> ListarPorResponsable(int personaId)
+        public List<EventoDeportivo> ListarPorResponsable(Guid personaId)
         {
             using var context = new MyContext();
             return context.EventosDeportivos
@@ -64,7 +64,7 @@ namespace CentroEventos.Repositorios.Repos
                 .ToList();
         }
 
-        public bool ExisteEventoConResponsable(int responsableId)
+        public bool ExisteEventoConResponsable(Guid responsableId)
         {
             using var context = new MyContext();
             return context.EventosDeportivos.Any(e => e.ResponsableId == responsableId);

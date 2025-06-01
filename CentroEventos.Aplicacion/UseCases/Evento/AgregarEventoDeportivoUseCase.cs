@@ -4,22 +4,27 @@ using CentroEventos.Aplicacion.Exceptions;
 using CentroEventos.Aplicacion.Interfaces;
 using CentroEventos.Aplicacion.Validators;
 
-namespace CentroEventos.Aplicacion.CasosDeUso.Evento
+namespace CentroEventos.Aplicacion.UseCases.Evento
 {
     public class AgregarEventoDeportivoUseCase(IRepositorioEventoDeportivo repo, ValidadorEventoDeportivo validador, IServicioAutorizacion aut)
     {
-        private readonly IRepositorioEventoDeportivo _repo = repo;
-        private readonly ValidadorEventoDeportivo validador = validador;
-        private readonly IServicioAutorizacion aut = aut;
+        private readonly IRepositorioEventoDeportivo _repositorio = repo;
+        private readonly ValidadorEventoDeportivo _validador = validador;
+        private readonly IServicioAutorizacion _servicioAutorizacion = aut;
 
-        public void Ejecutar(EventoDeportivo evento, int idUsuario)
+        public void Ejecutar(EventoDeportivo eventoDeportivo, Guid usuarioId)
         {
-            if (!aut.PoseeElPermiso(idUsuario, permiso: Permiso.EventoAlta))
+            VerificarAutorizacion(usuarioId);
+            _validador.Validar(eventoDeportivo);
+            _repositorio.Agregar(eventoDeportivo);
+        }
+
+        private void VerificarAutorizacion(Guid usuarioId)
+        {
+            if (!_servicioAutorizacion.PoseeElPermiso(usuarioId, Permiso.EventoAlta))
             {
-                throw new FalloAutorizacionException("No posee los permisos para realizar la operación");
+                throw new FalloAutorizacionException();
             }
-            validador.Validar(evento); //logica de negocio implementada en el validador
-            _repo.Agregar(evento);
         }
     }
 }

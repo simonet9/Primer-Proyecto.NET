@@ -5,9 +5,10 @@ namespace CentroEventos.Aplicacion.Service
 {
     public class ServicioAutorizacionProvisorio : IServicioAutorizacion
     {
-        public bool PoseeElPermiso(int idUsuario, Permiso permiso)
+        private static readonly Guid AdminId = new Guid("00000000-0000-0000-0000-000000000001");
+        public bool PoseeElPermiso(Guid idUsuario, Permiso permiso)
         {
-            return idUsuario == 1;
+            return idUsuario == AdminId;
         }
     }
 }

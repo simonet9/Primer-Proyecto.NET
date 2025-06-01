@@ -3,27 +3,33 @@ using CentroEventos.Aplicacion.Enum;
 using CentroEventos.Aplicacion.Exceptions;
 using CentroEventos.Aplicacion.Interfaces;
 
-namespace CentroEventos.Aplicacion.CasosDeUso.Evento
+namespace CentroEventos.Aplicacion.UseCases.Evento
 {
-    public class EliminarEventoDeportivoUseCase(IRepositorioEventoDeportivo repo, IServicioAutorizacion aut, IRepositorioReserva repoReserva)
+    public class EliminarEventoDeportivoUseCase(IRepositorioEventoDeportivo repositorioEvento, IServicioAutorizacion aut, IRepositorioReserva repoReserva)
     {
-        private readonly IRepositorioEventoDeportivo _repo = repo;
-        private readonly IServicioAutorizacion _aut = aut;
-        private readonly IRepositorioReserva _repoReserva = repoReserva;
+        private readonly IRepositorioEventoDeportivo _repositorioEvento = repositorioEvento;
+        private readonly IServicioAutorizacion _servicioAutorizacion = aut;
+        private readonly IRepositorioReserva _repositorioReserva = repoReserva;
 
-        public void Ejecutar(EventoDeportivo evento, int idUsuario)
+        public void Ejecutar(Guid eventoId, Guid usuarioId)
         {
-            if (!_aut.PoseeElPermiso(idUsuario, permiso: Permiso.EventoBaja))
+            ValidarAutorizacion(usuarioId);
+            ValidarReservasExistentes(eventoId);
+            _repositorioEvento.Eliminar(eventoId);
+        }
+        private void ValidarAutorizacion(Guid usuarioId)
+        {
+            if (!_servicioAutorizacion.PoseeElPermiso(usuarioId, Permiso.EventoBaja))
             {
                 throw new FalloAutorizacionException();
             }
-
-            if (_repoReserva.ContarPorEvento(evento.Id) > 0)
+        }
+        private void ValidarReservasExistentes(Guid eventoId)
+        {
+            if (_repositorioReserva.ContarPorEvento(eventoId) > 0)
             {
-                throw new OperacionInvalidaException("Existen reservas asignadas al evento");
+                throw new OperacionInvalidaException("Existen reservas asociadas a este evento deportivo. No se puede eliminar.");
             }
-
-            _repo.Eliminar(evento.Id);
         }
     }
 }

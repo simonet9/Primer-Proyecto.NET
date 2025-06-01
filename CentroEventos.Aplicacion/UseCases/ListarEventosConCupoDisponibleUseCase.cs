@@ -1,7 +1,7 @@
 using CentroEventos.Aplicacion.Entities;
 using CentroEventos.Aplicacion.Interfaces;
 
-namespace CentroEventos.Aplicacion.CasosDeUso
+namespace CentroEventos.Aplicacion.UseCases
 {
     public class ListarEventosConCupoDisponibleUseCase(
         IRepositorioEventoDeportivo repoEvento,
@@ -12,22 +12,12 @@ namespace CentroEventos.Aplicacion.CasosDeUso
 
         public List<EventoDeportivo> Ejecutar()
         {
-            List<EventoDeportivo> resultado = new List<EventoDeportivo>();
-            List<EventoDeportivo> todos = _repoEvento.Listar();
             DateTime ahora = DateTime.Now;
 
-            foreach (EventoDeportivo evento in todos)
-            {
-                if (evento.FechaHoraInicio > ahora)
-                {
-                    int reservasActuales = _repoReserva.ContarPorEvento(evento.Id);
-                    if (reservasActuales < evento.CupoMaximo)
-                    {
-                        resultado.Add(evento);
-                    }
-                }
-            }
-            return resultado;
+            return _repoEvento.Listar()
+                .Where(evento => evento.FechaHoraInicio > ahora &&
+                                 _repoReserva.ContarPorEvento(evento.Id) < evento.CupoMaximo)
+                .ToList();
         }
     }
 }

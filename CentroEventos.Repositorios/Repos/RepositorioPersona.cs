@@ -1,9 +1,7 @@
 ﻿using CentroEventos.Aplicacion.Entities;
 using CentroEventos.Aplicacion.Interfaces;
 using CentroEventos.Repositorios.Data;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
+
 
 namespace CentroEventos.Repositorios.Repos
 {
@@ -16,13 +14,13 @@ namespace CentroEventos.Repositorios.Repos
             context.SaveChanges();
         }
 
-        public Persona? BuscarPorId(int id)
+        public Persona? BuscarPorId(Guid id)
         {
             using var context = new MyContext();
             return context.Personas.Find(id);
         }
 
-        public void Eliminar(int id)
+        public void Eliminar(Guid id)
         {
             using var context = new MyContext();
             var persona = context.Personas.Find(id);
@@ -33,13 +31,13 @@ namespace CentroEventos.Repositorios.Repos
             }
         }
 
-        public bool ExisteDNI(string dni, int idIgnorado)
+        public bool ExisteDNI(string dni, Guid idIgnorado)
         {
             using var context = new MyContext();
             return context.Personas.Any(p => p.DNI == dni && p.Id != idIgnorado);
         }
 
-        public bool ExisteEmail(string email, int idIgnorado)
+        public bool ExisteEmail(string email, Guid idIgnorado)
         {
             using var context = new MyContext();
             return context.Personas.Any(p => p.Email == email && p.Id != idIgnorado);

@@ -1,7 +1,7 @@
 using CentroEventos.Aplicacion.Entities;
 using CentroEventos.Aplicacion.Interfaces;
 
-namespace CentroEventos.Aplicacion.CasosDeUso.Personas
+namespace CentroEventos.Aplicacion.UseCases.Personas
 {
     public class ListarPersonasUseCase(IRepositorioPersona repo)
     {

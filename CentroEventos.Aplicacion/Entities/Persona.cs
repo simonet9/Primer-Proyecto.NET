@@ -1,13 +1,26 @@
-﻿namespace CentroEventos.Aplicacion.Entities;
+﻿
+namespace CentroEventos.Aplicacion.Entities;
 
-public class Persona(int id, string dNI, string nombre, string apellido, string email, string telefono)
+public class Persona
 {
-    public int Id { get; set; } = id;
-    public string DNI { get; set; } = dNI;
-    public string Nombre { get; set; } = nombre;
-    public string Apellido { get; set; } = apellido;
-    public string Email { get; set; } = email;
-    public string Telefono { get; set; } = telefono;
+    public Guid Id { get; set; }
+    public string DNI { get; set; }
+    public string Nombre { get; set; }
+    public string Apellido { get; set; }
+    public string Email { get; set; }
+    public string Telefono { get; set; }
+
+    public Persona(Guid id, string dNI, string nombre, string apellido, string email, string telefono)
+    {
+        Id = id;
+        DNI = dNI;
+        Nombre = nombre;
+        Apellido = apellido;
+        Email = email;
+        Telefono = telefono;
+    }
+
+    protected Persona() { } // Constructor sin parámetros para EF Core
 
     public override string ToString()
     {

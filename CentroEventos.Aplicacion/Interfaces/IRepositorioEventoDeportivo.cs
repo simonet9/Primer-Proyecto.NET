@@ -4,14 +4,14 @@ namespace CentroEventos.Aplicacion.Interfaces
 {
     public interface IRepositorioEventoDeportivo
     {
-        EventoDeportivo? BuscarPorId(int id);
+        EventoDeportivo? BuscarPorId(Guid id);
         void Agregar(EventoDeportivo evento);
         void Modificar(EventoDeportivo evento);
-        void Eliminar(int id);
+        void Eliminar(Guid id);
         List<EventoDeportivo> Listar();
         List<EventoDeportivo> ListarFuturosConCupoDisponible();
-        List<EventoDeportivo> ListarPorResponsable(int personaId);
-        bool ExisteEventoConResponsable(int responsableId);
+        List<EventoDeportivo> ListarPorResponsable(Guid personaId);
+        bool ExisteEventoConResponsable(Guid responsableId);
 
     }
 }

@@ -4,20 +4,30 @@ using CentroEventos.Aplicacion.Exceptions;
 using CentroEventos.Aplicacion.Interfaces;
 using CentroEventos.Aplicacion.Validators;
 
-namespace CentroEventos.Aplicacion.CasosDeUso.Personas
+namespace CentroEventos.Aplicacion.UseCases.Personas
 {
-    public class ModificarPersonaUseCase(IRepositorioPersona repo, ValidadorPersona validador, IServicioAutorizacion aut)
+    public class ModificarPersonaUseCase(
+        IRepositorioPersona repositorioPersona, 
+        ValidadorPersona validadorPersona, 
+        IServicioAutorizacion servicioAutorizacion)
     {
-        private readonly IRepositorioPersona _repo = repo;
-        private readonly ValidadorPersona validador = validador;
-        private readonly IServicioAutorizacion _aut = aut;
+        private readonly IRepositorioPersona _repositorioPersona = repositorioPersona;
+        private readonly ValidadorPersona _validadorPersona = validadorPersona;
+        private readonly IServicioAutorizacion _servicioAutorizacion = servicioAutorizacion;
 
-        public void Ejecutar(Persona persona, int idUsuario)
+        public void ActualizarPersona(Persona persona, Guid idUsuario, string? mensajeError = null)
         {
-            if (!_aut.PoseeElPermiso(idUsuario, Permiso.UsuarioModificacion))
-                throw new FalloAutorizacionException();
-            validador.Validar(persona);
-            _repo.Modificar(persona);
+            ValidarAutorizacion(idUsuario, mensajeError);
+            _validadorPersona.Validar(persona);
+            _repositorioPersona.Modificar(persona);
+        }
+
+        private void ValidarAutorizacion(Guid idUsuario, string? mensajeError)
+        {
+            if (!_servicioAutorizacion.PoseeElPermiso(idUsuario, Permiso.UsuarioModificacion))
+            {
+                throw new FalloAutorizacionException(mensajeError);
+            }
         }
     }
 }

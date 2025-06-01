@@ -1,11 +1,12 @@
-﻿using CentroEventos.Aplicacion.CasosDeUso;
+﻿using CentroEventos.Aplicacion.UseCases;
 using Microsoft.Extensions.DependencyInjection;
 using CentroEventos.Aplicacion.Interfaces;
-using CentroEventos.Aplicacion.CasosDeUso.Personas;
-using CentroEventos.Aplicacion.CasosDeUso.Evento;
-using CentroEventos.Aplicacion.CasosDeUso.Reservas;
 using CentroEventos.Aplicacion.Validators;
 using CentroEventos.Aplicacion.Service;
+using CentroEventos.Aplicacion.UseCases;
+using CentroEventos.Aplicacion.UseCases.Evento;
+using CentroEventos.Aplicacion.UseCases.Personas;
+using CentroEventos.Aplicacion.UseCases.Reservas;
 using CentroEventos.Repositorios.Repos;
 
 var services = new ServiceCollection();

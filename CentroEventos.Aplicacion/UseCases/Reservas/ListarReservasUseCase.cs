@@ -1,7 +1,7 @@
 using CentroEventos.Aplicacion.Entities;
 using CentroEventos.Aplicacion.Interfaces;
 
-namespace CentroEventos.Aplicacion.CasosDeUso.Reservas
+namespace CentroEventos.Aplicacion.UseCases.Reservas
 {
     public class ListarReservasUseCase(
         IRepositorioReserva repoReserva

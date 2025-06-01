@@ -4,7 +4,7 @@ using CentroEventos.Aplicacion.Exceptions;
 using CentroEventos.Aplicacion.Interfaces;
 using CentroEventos.Aplicacion.Validators;
 
-namespace CentroEventos.Aplicacion.CasosDeUso.Reservas
+namespace CentroEventos.Aplicacion.UseCases.Reservas
 {
     public class ModificarReservaUseCase(
         IRepositorioReserva repoReserva,
@@ -19,24 +19,38 @@ namespace CentroEventos.Aplicacion.CasosDeUso.Reservas
         private readonly IRepositorioEventoDeportivo _repoEvento = repoEventos;
         private readonly IRepositorioPersona _repoPersona = repoPersonas;
 
-        public void Ejecutar(Reserva reserva, int idUsuario)
-        {
-            // Verifica permisos
-            if (!_aut.PoseeElPermiso(idUsuario, Permiso.ReservaModificacion))
-                throw new FalloAutorizacionException("No tiene permiso para modificar reservas.");
+    public void Ejecutar(Reserva reserva, Guid idUsuario)
+    {
+        ValidarAutorizacion(idUsuario);
+        ValidarExistenciaPersona(reserva.PersonaId);
+        var evento = ObtenerEvento(reserva.EventoDeportivoId);
+        ValidarCupoDisponible(reserva.EventoDeportivoId, evento.CupoMaximo);
+        _validacion.Validar(reserva);
+        _repoReserva.Modificar(reserva);
+    }
 
-            if (_repoPersona.BuscarPorId(reserva.PersonaId) == null)
-                throw new EntidadNotFoundException("La persona no existe.");
+    private void ValidarAutorizacion(Guid idUsuario)
+    {
+        if (!_aut.PoseeElPermiso(idUsuario, Permiso.ReservaModificacion))
+            throw new FalloAutorizacionException("No tiene permiso para modificar reservas.");
+    }
 
-            EventoDeportivo evento = _repoEvento.BuscarPorId(reserva.EventoDeportivoId) ?? throw new EntidadNotFoundException("El evento no existe.");
-            int cantidadReservas = _repoReserva.ContarPorEvento(reserva.EventoDeportivoId);
-            if (cantidadReservas >= evento.CupoMaximo)
-                throw new CupoExcedidoException("No hay cupo disponible para este evento.");
+    private void ValidarExistenciaPersona(Guid personaId)
+    {
+        if (_repoPersona.BuscarPorId(personaId) is null)
+            throw new EntidadNotFoundException("La persona no existe.");
+    }
 
+    private EventoDeportivo ObtenerEvento(Guid eventoId)
+    {
+        return _repoEvento.BuscarPorId(eventoId)
+            ?? throw new EntidadNotFoundException("El evento no existe.");
+    }
 
-
-            // Realiza la modificación
-            _repoReserva.Modificar(reserva);
-        }
+    private void ValidarCupoDisponible(Guid eventoId, int cupoMaximo)
+    {
+        if (_repoReserva.ContarPorEvento(eventoId) >= cupoMaximo)
+            throw new CupoExcedidoException("No hay cupo disponible para este evento.");
+    }
     }
 }

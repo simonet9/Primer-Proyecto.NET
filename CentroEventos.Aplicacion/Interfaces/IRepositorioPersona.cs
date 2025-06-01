@@ -4,12 +4,12 @@ namespace CentroEventos.Aplicacion.Interfaces
 {
     public interface IRepositorioPersona
     {
-        Persona? BuscarPorId(int id);
-        bool ExisteDNI(string dni, int idIgnorado = 0);
-        bool ExisteEmail(string email, int idIgnorado = 0);
+        Persona? BuscarPorId(Guid id);
+        bool ExisteDNI(string dni, Guid idIgnorado = default);
+        bool ExisteEmail(string email, Guid idIgnorado = default);
         void Agregar(Persona persona);
         void Modificar(Persona persona);
-        void Eliminar(int id);
+        void Eliminar(Guid id);
         List<Persona> Listar();
     }
 }

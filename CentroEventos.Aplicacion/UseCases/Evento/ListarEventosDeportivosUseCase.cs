@@ -1,7 +1,7 @@
 using CentroEventos.Aplicacion.Entities;
 using CentroEventos.Aplicacion.Interfaces;
 
-namespace CentroEventos.Aplicacion.CasosDeUso.Evento
+namespace CentroEventos.Aplicacion.UseCases.Evento
 {
     public class ListarEventosDeportivoUseCase(IRepositorioEventoDeportivo repo)
     {

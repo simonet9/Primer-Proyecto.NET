@@ -17,7 +17,7 @@ namespace CentroEventos.Repositorios.Repos
             context.SaveChanges();
         }
 
-        public Reserva? BuscarPorId(int id)
+        public Reserva? BuscarPorId(Guid id)
         {
             using var context = new MyContext();
             return context.Reservas.Find(id);
@@ -36,7 +36,7 @@ namespace CentroEventos.Repositorios.Repos
             context.SaveChanges();
         }
 
-        public void Eliminar(int id)
+        public void Eliminar(Guid id)
         {
             using var context = new MyContext();
             var reserva = context.Reservas.Find(id);
@@ -47,25 +47,25 @@ namespace CentroEventos.Repositorios.Repos
             }
         }
 
-        public int ContarPorEvento(int eventoId)
+        public int ContarPorEvento(Guid eventoId)
         {
             using var context = new MyContext();
             return context.Reservas.Count(r => r.EventoDeportivoId == eventoId);
         }
 
-        public bool ExisteReserva(int personaId, int eventoId)
+        public bool ExisteReserva(Guid personaId, Guid eventoId)
         {
             using var context = new MyContext();
             return context.Reservas.Any(r => r.PersonaId == personaId && r.EventoDeportivoId == eventoId);
         }
 
-        public List<Reserva> ListarPorEvento(int eventoId)
+        public List<Reserva> ListarPorEvento(Guid eventoId)
         {
             using var context = new MyContext();
             return context.Reservas.Where(r => r.EventoDeportivoId == eventoId).ToList();
         }
 
-        public List<Reserva> ListarPorPersona(int personaId)
+        public List<Reserva> ListarPorPersona(Guid personaId)
         {
             using var context = new MyContext();
             return context.Reservas.Where(r => r.PersonaId == personaId).ToList();
