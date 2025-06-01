@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+#
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CentroEventos.Aplicacion", "CentroEventos.Aplicacion\CentroEventos.Aplicacion.csproj", "{06FE1133-7E4A-44AD-81E0-F2E2144DFC8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CentroEventos.Consola", "CentroEventos.Consola\CentroEventos.Consola.csproj", "{7A6C654A-FB8C-4AC6-A5C1-8CCBBECCDC09}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CentroEventos.Repositorios", "CentroEventos.Repositorios\CentroEventos.Repositorios.csproj", "{AFF3F584-FE8D-48FC-B972-FE3E270D0796}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{06FE1133-7E4A-44AD-81E0-F2E2144DFC8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06FE1133-7E4A-44AD-81E0-F2E2144DFC8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06FE1133-7E4A-44AD-81E0-F2E2144DFC8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06FE1133-7E4A-44AD-81E0-F2E2144DFC8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A6C654A-FB8C-4AC6-A5C1-8CCBBECCDC09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A6C654A-FB8C-4AC6-A5C1-8CCBBECCDC09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A6C654A-FB8C-4AC6-A5C1-8CCBBECCDC09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A6C654A-FB8C-4AC6-A5C1-8CCBBECCDC09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFF3F584-FE8D-48FC-B972-FE3E270D0796}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFF3F584-FE8D-48FC-B972-FE3E270D0796}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFF3F584-FE8D-48FC-B972-FE3E270D0796}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFF3F584-FE8D-48FC-B972-FE3E270D0796}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
