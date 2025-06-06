@@ -3,7 +3,7 @@ namespace CentroEventos.Aplicacion.Entities;
 
 public class EventoDeportivo
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string Nombre { get; set; }
     public string Descripcion { get; set; }
     public DateTime FechaHoraInicio { get; set; }
@@ -11,9 +11,8 @@ public class EventoDeportivo
     public int CupoMaximo { get; set; }
     public Guid ResponsableId { get; set; }
 
-    public EventoDeportivo(Guid id, string nombre, string descripcion, DateTime fechaHoraInicio, double duracionHoras, int cupoMaximo, Guid responsableId)
+    public EventoDeportivo(string nombre, string descripcion, DateTime fechaHoraInicio, double duracionHoras, int cupoMaximo, Guid responsableId)
     {
-        Id = id;
         Nombre = nombre;
         Descripcion = descripcion;
         FechaHoraInicio = fechaHoraInicio;

@@ -39,11 +39,9 @@ namespace CentroEventos.Repositorios.Repos
         {
             using var context = new MyContext();
             var evento = context.EventosDeportivos.Find(id);
-            if (evento != null)
-            {
-                context.EventosDeportivos.Remove(evento);
-                context.SaveChanges();
-            }
+            if (evento == null) return;
+            context.EventosDeportivos.Remove(evento);
+            context.SaveChanges();
         }
 
         public List<EventoDeportivo> ListarFuturosConCupoDisponible()

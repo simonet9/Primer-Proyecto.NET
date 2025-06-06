@@ -1,4 +1,5 @@
 using CentroEventos.Aplicacion.Entities;
+using CentroEventos.Aplicacion.Enum;
 using CentroEventos.Aplicacion.Exceptions;
 using CentroEventos.Aplicacion.Interfaces;
 using CentroEventos.Aplicacion.Validators;
@@ -13,6 +14,10 @@ namespace CentroEventos.Aplicacion.UseCases
         private readonly IRepositorioEventoDeportivo _repoEvento = repoEvento;
         private readonly IRepositorioReserva _repoReserva = repoReserva;
         private readonly IRepositorioPersona _repoPersona = repoPersona;
+        
+        
+        // ● Debe corroborarse que el estado de la reserva sea Presente a la hora de listar las
+        //personas que asistieron al evento.
         public List<Persona> Ejecutar(Guid eventoId)
         {
             var evento = ValidarYObtenerEvento(eventoId);
@@ -30,7 +35,7 @@ namespace CentroEventos.Aplicacion.UseCases
                    ?? throw new EntidadNotFoundException("Evento deportivo no encontrado.");
         }
 
-        private void ValidarFechaEvento(EventoDeportivo evento)
+        private static void ValidarFechaEvento(EventoDeportivo evento)
         {
             if (evento.FechaHoraInicio > DateTime.Now)
             {
@@ -40,7 +45,8 @@ namespace CentroEventos.Aplicacion.UseCases
 
         private List<Persona> ObtenerAsistentesDeReservas(IEnumerable<Reserva> reservas)
         {
-            return reservas
+            var reservaPresente = reservas.Where(r => r.EstadoAsistencia == Estado.Presente);
+            return reservaPresente
                 .Select(r => _repoPersona.BuscarPorId(r.PersonaId))
                 .Where(p => p != null)
                 .ToList()!;

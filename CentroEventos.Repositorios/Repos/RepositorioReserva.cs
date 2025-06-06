@@ -40,11 +40,9 @@ namespace CentroEventos.Repositorios.Repos
         {
             using var context = new MyContext();
             var reserva = context.Reservas.Find(id);
-            if (reserva != null)
-            {
-                context.Reservas.Remove(reserva);
-                context.SaveChanges();
-            }
+            if (reserva == null) return;
+            context.Reservas.Remove(reserva);
+            context.SaveChanges();
         }
 
         public int ContarPorEvento(Guid eventoId)

@@ -11,9 +11,9 @@ namespace CentroEventos.Aplicacion.UseCases.Personas
         private readonly IRepositorioPersona _repo = repo;
         private readonly ValidadorPersona _validador = validador;
         private readonly IServicioAutorizacion _aut = aut;
-        public void Ejecutar(Persona persona, Guid idUsuario)
+        public void Ejecutar(Persona persona)
         {
-            VerificarAutorizacion(idUsuario);
+            VerificarAutorizacion(new Guid("00000000-0000-0000-0000-000000000001")); // Reemplazar con el ID del usuario actual
             _validador.Validar(persona);
             _repo.Agregar(persona);
         }
