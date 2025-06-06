@@ -1,5 +1,6 @@
 using CentroEventos.Aplicacion.Entities;
 using CentroEventos.Aplicacion.Interfaces;
+using CentroEventos.Aplicacion.Validators;
 
 namespace CentroEventos.Aplicacion.UseCases.Personas
 {
@@ -8,7 +9,8 @@ namespace CentroEventos.Aplicacion.UseCases.Personas
         private readonly IRepositorioPersona _repo = repo;
         public List<Persona> Ejecutar()
         {
-            return _repo.Listar();
+            var personas = _repo.Listar();
+            return ValidadorListas.ValidarNoVacia(personas, "No hay personas registradas.");
         }
     }
 }

@@ -1,5 +1,6 @@
 using CentroEventos.Aplicacion.Entities;
 using CentroEventos.Aplicacion.Interfaces;
+using CentroEventos.Aplicacion.Validators;
 
 namespace CentroEventos.Aplicacion.UseCases.Reservas
 {
@@ -11,7 +12,8 @@ namespace CentroEventos.Aplicacion.UseCases.Reservas
 
         public List<Reserva> Ejecutar()
         {
-            return _repoReserva.Listar();
+            var reservas = _repoReserva.Listar();
+            return ValidadorListas.ValidarNoVacia(reservas, "No hay reservas registradas.");
         }
     }
 }

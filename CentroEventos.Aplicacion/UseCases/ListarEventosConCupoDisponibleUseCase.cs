@@ -1,5 +1,6 @@
 using CentroEventos.Aplicacion.Entities;
 using CentroEventos.Aplicacion.Interfaces;
+using CentroEventos.Aplicacion.Validators;
 
 namespace CentroEventos.Aplicacion.UseCases
 {
@@ -12,12 +13,32 @@ namespace CentroEventos.Aplicacion.UseCases
 
         public List<EventoDeportivo> Ejecutar()
         {
-            DateTime ahora = DateTime.Now;
+            var todosLosEventos = _repoEvento.Listar();
+            var eventosDisponibles = FiltrarEventosDisponibles(todosLosEventos);
+            
+            return ValidadorListas.ValidarNoVacia(
+                eventosDisponibles, 
+                "No hay eventos disponibles con cupo.");
+        }
 
-            return _repoEvento.Listar()
-                .Where(evento => evento.FechaHoraInicio > ahora &&
-                                 _repoReserva.ContarPorEvento(evento.Id) < evento.CupoMaximo)
+        private List<EventoDeportivo> FiltrarEventosDisponibles(List<EventoDeportivo> eventos)
+        {
+            return eventos
+                .Where(TieneFechaValida)
+                .Where(TieneCupoDisponible)
                 .ToList();
         }
+
+        private static bool TieneFechaValida(EventoDeportivo evento)
+        {
+            return evento.FechaHoraInicio > DateTime.Now;
+        }
+
+        private bool TieneCupoDisponible(EventoDeportivo evento)
+        {
+            var reservasActuales = _repoReserva.ContarPorEvento(evento.Id);
+            return reservasActuales < evento.CupoMaximo;
+        }
+
     }
 }

@@ -1,5 +1,6 @@
 using CentroEventos.Aplicacion.Entities;
 using CentroEventos.Aplicacion.Interfaces;
+using CentroEventos.Aplicacion.Validators;
 
 namespace CentroEventos.Aplicacion.UseCases.Evento
 {
@@ -9,7 +10,8 @@ namespace CentroEventos.Aplicacion.UseCases.Evento
 
         public List<EventoDeportivo> Ejecutar()
         {
-            return _repo.Listar();
+            var eventos = _repo.Listar();
+            return ValidadorListas.ValidarNoVacia(eventos, "No hay eventos deportivos registrados.");
         }
     }
 }
