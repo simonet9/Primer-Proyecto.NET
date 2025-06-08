@@ -4,18 +4,13 @@ using CentroEventos.Aplicacion.Exceptions;
 using CentroEventos.Aplicacion.Interfaces;
 using CentroEventos.Aplicacion.Validators;
 
-namespace CentroEventos.Aplicacion.UseCases
+namespace CentroEventos.Aplicacion.UseCases.Reservas
 {
     public class ListarAsistenciaAEventoUseCase(
         IRepositorioEventoDeportivo repoEvento,
         IRepositorioReserva repoReserva,
         IRepositorioPersona repoPersona)
     {
-        private readonly IRepositorioEventoDeportivo _repoEvento = repoEvento;
-        private readonly IRepositorioReserva _repoReserva = repoReserva;
-        private readonly IRepositorioPersona _repoPersona = repoPersona;
-        
-        
         // ● Debe corroborarse que el estado de la reserva sea Presente a la hora de listar las
         //personas que asistieron al evento.
         public List<Persona> Ejecutar(Guid eventoId)
@@ -23,7 +18,7 @@ namespace CentroEventos.Aplicacion.UseCases
             var evento = ValidarYObtenerEvento(eventoId);
             ValidarFechaEvento(evento);
             
-            var reservas = _repoReserva.ListarPorEvento(eventoId);
+            var reservas = repoReserva.ListarPorEvento(eventoId);
             var asistentes = ObtenerAsistentesDeReservas(reservas);
             
             return ValidadorListas.ValidarNoVacia(asistentes,"No hay personas registradas para este evento.");
@@ -31,7 +26,7 @@ namespace CentroEventos.Aplicacion.UseCases
 
         private EventoDeportivo ValidarYObtenerEvento(Guid eventoId)
         {
-            return _repoEvento.BuscarPorId(eventoId) 
+            return repoEvento.BuscarPorId(eventoId) 
                    ?? throw new EntidadNotFoundException("Evento deportivo no encontrado.");
         }
 
@@ -47,7 +42,7 @@ namespace CentroEventos.Aplicacion.UseCases
         {
             var reservaPresente = reservas.Where(r => r.EstadoAsistencia == Estado.Presente);
             return reservaPresente
-                .Select(r => _repoPersona.BuscarPorId(r.PersonaId))
+                .Select(r => repoPersona.BuscarPorId(r.PersonaId))
                 .Where(p => p != null)
                 .ToList()!;
         }

@@ -7,10 +7,9 @@ namespace CentroEventos.Aplicacion.Interfaces
         EventoDeportivo? BuscarPorId(Guid id);
         void Agregar(EventoDeportivo evento);
         void Modificar(EventoDeportivo evento);
-        void Eliminar(Guid id);
+        void Eliminar(EventoDeportivo evento);
         List<EventoDeportivo> Listar();
-        List<EventoDeportivo> ListarFuturosConCupoDisponible();
-        List<EventoDeportivo> ListarPorResponsable(Guid personaId);
+        void GuardarCambios();
         bool ExisteEventoConResponsable(Guid responsableId);
 
     }

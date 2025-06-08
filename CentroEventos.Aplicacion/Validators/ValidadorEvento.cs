@@ -4,11 +4,9 @@ using CentroEventos.Aplicacion.Interfaces;
 
 namespace CentroEventos.Aplicacion.Validators
 {
-    public class ValidadorEventoDeportivo(IRepositorioPersona repoPersona)
+    public static class ValidadorEventoDeportivo
     {
-        private readonly IRepositorioPersona _repoPersona = repoPersona;
-
-        public void Validar(EventoDeportivo evento)
+        public static void Validar(EventoDeportivo evento)
         {
             if (string.IsNullOrWhiteSpace(evento.Nombre))
                 throw new ValidacionExcepcion("El nombre del evento no puede estar vacío.");
@@ -24,9 +22,6 @@ namespace CentroEventos.Aplicacion.Validators
 
             if (evento.DuracionHoras <= 0)
                 throw new ValidacionExcepcion("La duración debe ser mayor que cero.");
-
-            if (_repoPersona.BuscarPorId(evento.ResponsableId) == null)
-                throw new EntidadNotFoundException("El responsable indicado no existe.");
         }
     }
 }

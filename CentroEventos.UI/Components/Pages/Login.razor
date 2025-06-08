@@ -1,0 +1,62 @@
+﻿@page "/Login"
+@using CentroEventos.UI.Components.Layout
+@using CentroEventos.UI.Components.Pages.Shared
+@layout LoginLayout
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 100vh;">
+    <MudPaper Elevation="25" Class="pa-8" Style="width: 500px; backdrop-filter: blur(10px); background-color: rgba(255,255,255,0.8);">
+        <MudStack Class="align-center" Spacing="4">
+            <MudAvatar Color="Color.Primary" Style="width: 80px; height: 80px;">
+                <MudIcon Icon="@Icons.Material.Filled.Person" Size="Size.Large" />
+            </MudAvatar>
+            
+            <MudText Typo="Typo.h4" Class="mb-4">Bienvenido</MudText>
+            
+            <FormularioUsuario 
+                OnSubmit="ProcesarLogin"
+                ShowRememberMe="true"
+                BotonSubmitTexto="Iniciar Sesión"
+                BotonSubmitIcono="@Icons.Material.Filled.Login"
+                ProcesoTexto="Iniciando sesión..."
+                MostrarOlvidePassword="true" />
+
+            @if (_mensajeError is not null)
+            {
+                <MudAlert Severity="Severity.Error" Class="mt-4">@_mensajeError</MudAlert>
+            }
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+
+<style>
+    :global(.mud-main-content) {
+        background: linear-gradient(135deg, #1976d2 0%, #115293 100%);
+    }
+</style>
+
+@code {
+    private string? _mensajeError;
+    
+    private async Task ProcesarLogin(FormularioUsuario.UsuarioModel modelo)
+    {
+        try
+        {
+            _mensajeError = null;
+            // Aquí iría la lógica específica de login
+            await Task.Delay(2000); // Simulación
+            
+            // Ejemplo de validación
+            if (string.IsNullOrEmpty(modelo.Email) || !modelo.Email.Contains("@"))
+            {
+                _mensajeError = "Correo electrónico inválido";
+                return;
+            }
+            
+            // Aquí iría la navegación post-login
+        }
+        catch (Exception ex)
+        {
+            _mensajeError = "Error al iniciar sesión: " + ex.Message;
+        }
+    }
+}

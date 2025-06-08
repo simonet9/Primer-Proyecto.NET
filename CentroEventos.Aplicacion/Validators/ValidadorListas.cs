@@ -1,11 +1,13 @@
-﻿namespace CentroEventos.Aplicacion.Validators;
+﻿using CentroEventos.Aplicacion.Exceptions;
 
-public class ValidadorListas
+namespace CentroEventos.Aplicacion.Validators;
+
+public static class ValidadorListas
 {
     public static List<T> ValidarNoVacia<T>(List<T>? lista, string mensajeError)
     {
         if (lista == null || lista.Count == 0)
-            throw new InvalidOperationException(mensajeError);
+            throw new OperacionInvalidaException(mensajeError);
         return lista;
     }
 }

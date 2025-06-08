@@ -7,27 +7,13 @@ using CentroEventos.Aplicacion.Validators;
 namespace CentroEventos.Aplicacion.UseCases.Personas
 {
     public class ModificarPersonaUseCase(
-        IRepositorioPersona repositorioPersona, 
-        ValidadorPersona validadorPersona, 
-        IServicioAutorizacion servicioAutorizacion)
+        IRepositorioPersona repositorioPersona)
     {
-        private readonly IRepositorioPersona _repositorioPersona = repositorioPersona;
-        private readonly ValidadorPersona _validadorPersona = validadorPersona;
-        private readonly IServicioAutorizacion _servicioAutorizacion = servicioAutorizacion;
-
-        public void ActualizarPersona(Persona persona, Guid idUsuario, string? mensajeError = null)
+        public void Ejecutar(Persona persona)
         {
-            ValidarAutorizacion(idUsuario, mensajeError);
-            _validadorPersona.Validar(persona);
-            _repositorioPersona.Modificar(persona);
-        }
-
-        private void ValidarAutorizacion(Guid idUsuario, string? mensajeError)
-        {
-            if (!_servicioAutorizacion.PoseeElPermiso(idUsuario, Permiso.UsuarioModificacion))
-            {
-                throw new FalloAutorizacionException(mensajeError);
-            }
+            ValidadorPersona.Validar(persona);
+            repositorioPersona.Modificar(persona);
+            repositorioPersona.GuardarCambios();
         }
     }
 }

@@ -8,11 +8,9 @@ namespace CentroEventos.Aplicacion.UseCases.Reservas
         IRepositorioReserva repoReserva
         )
     {
-        private readonly IRepositorioReserva _repoReserva = repoReserva;
-
         public List<Reserva> Ejecutar()
         {
-            var reservas = _repoReserva.Listar();
+            var reservas = repoReserva.Listar();
             return ValidadorListas.ValidarNoVacia(reservas, "No hay reservas registradas.");
         }
     }

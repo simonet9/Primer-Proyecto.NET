@@ -8,6 +8,7 @@ using CentroEventos.Aplicacion.UseCases.Personas;
 using CentroEventos.Aplicacion.UseCases.Reservas;
 using CentroEventos.Repositorios.Repos;
 using CentroEventos.Repositorios.Data;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 
 
@@ -23,11 +24,9 @@ builder.Services.AddScoped<IRepositorioEventoDeportivo, RepositorioEventoDeporti
 builder.Services.AddScoped<IRepositorioReserva, RepositorioReserva>();
 
 // Servicios
-builder.Services.AddSingleton<IServicioAutorizacion, ServicioAutorizacionProvisorio>();
+builder.Services.AddSingleton<IServicioAutorizacion, ServicioAutorizacion>();
 
 // Validadores
-builder.Services.AddScoped<ValidadorPersona>();
-builder.Services.AddScoped<ValidadorEventoDeportivo>();
 builder.Services.AddScoped<ValidadorReserva>();
 
 // Casos de uso Personas
@@ -49,14 +48,27 @@ builder.Services.AddScoped<ReservaAltaUseCase>();
 builder.Services.AddScoped<ModificarReservaUseCase>();
 builder.Services.AddScoped<ListarReservasUseCase>();
 builder.Services.AddScoped<EliminarReservaUseCase>();
-
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddMudServices();
 
 
-
+builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
 var app = builder.Build();
 CentroEventosSqlite.Inicializar();
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<MyContext>();
+
+    context.Database.EnsureCreated();
+
+    var connection = context.Database.GetDbConnection();
+    connection.Open();
+    using (var command = connection.CreateCommand())
+    {
+        command.CommandText = "PRAGMA journal_mode=DELETE;";
+        command.ExecuteNonQuery();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

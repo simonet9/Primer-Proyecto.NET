@@ -6,20 +6,15 @@ using CentroEventos.Aplicacion.Validators;
 
 namespace CentroEventos.Aplicacion.UseCases.Evento
 {
-    public class ModificarEventoDeportivoUseCase(IRepositorioEventoDeportivo repo, ValidadorEventoDeportivo validador, IServicioAutorizacion aut)
+    public class ModificarEventoDeportivoUseCase(IRepositorioEventoDeportivo repo, IServicioAutorizacion aut)
+    : UseCaseConAutorizacion(aut)
     {
-        private readonly IRepositorioEventoDeportivo _repo = repo;
-        private readonly ValidadorEventoDeportivo _validador = validador;
-        private readonly IServicioAutorizacion _aut = aut;
-
         public void Ejecutar(EventoDeportivo evento, Guid idUsuario)
         {
-            if (!_aut.PoseeElPermiso(idUsuario, permiso: Permiso.EventoModificacion))
-            {
-                throw new FalloAutorizacionException("No posee los permisos para realizar la operación");
-            }
-            _validador.Validar(evento); //logica de negocio implementada en el validador
-            _repo.Modificar(evento);
+            ValidarAutorizacion(idUsuario, Permiso.EventoModificacion);
+            ValidadorEventoDeportivo.Validar(evento);
+            repo.Modificar(evento);
+            repo.GuardarCambios();
         }
     }
 }

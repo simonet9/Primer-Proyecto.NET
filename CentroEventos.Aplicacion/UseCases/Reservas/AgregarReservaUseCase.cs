@@ -10,23 +10,15 @@ namespace CentroEventos.Aplicacion.UseCases.Reservas
         IRepositorioReserva repoReserva,
         IServicioAutorizacion servicioAutorizacion,
         ValidadorReserva validador
-        )
+        ) : UseCaseConAutorizacion(servicioAutorizacion)
     {
-        private readonly IRepositorioReserva _repoReserva = repoReserva;
-        private readonly IServicioAutorizacion _servicioAutorizacion = servicioAutorizacion;
-        private readonly ValidadorReserva _validador = validador;
-
         public void Ejecutar(Reserva datosReserva, Guid idUsuario)
         {
-            ValidarAutorizacion(idUsuario);
-            _validador.Validar(datosReserva);
-            _repoReserva.Agregar(datosReserva);
-        }
-
-        private void ValidarAutorizacion(Guid idUsuario)
-        {
-            if (!_servicioAutorizacion.PoseeElPermiso(idUsuario, Permiso.ReservaAlta))
-                throw new FalloAutorizacionException();
+            ValidarAutorizacion(idUsuario,Permiso.EventoAlta);
+            validador.Validar(datosReserva);
+            if (repoReserva.BuscarPorId(datosReserva.Id) != null)
+                throw new OperacionInvalidaException("Ya existe una reserva con el mismo ID.");
+            repoReserva.Agregar(datosReserva);
         }
     }
 }

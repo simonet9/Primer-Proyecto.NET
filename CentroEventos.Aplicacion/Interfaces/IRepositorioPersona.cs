@@ -9,7 +9,8 @@ namespace CentroEventos.Aplicacion.Interfaces
         bool ExisteEmail(string email, Guid idIgnorado = default);
         void Agregar(Persona persona);
         void Modificar(Persona persona);
-        void Eliminar(Guid id);
+        void Eliminar(Persona persona);
+        void GuardarCambios();
         List<Persona> Listar();
     }
 }

@@ -3,11 +3,9 @@ using CentroEventos.Aplicacion.Exceptions;
 using CentroEventos.Aplicacion.Interfaces;
 namespace CentroEventos.Aplicacion.Validators
 {
-    public class ValidadorPersona(IRepositorioPersona repoPersona)
+    public static class ValidadorPersona
     {
-        private readonly IRepositorioPersona _repoPersona = repoPersona;
-
-        public void Validar(Persona persona)
+        public static void Validar(Persona persona)
         {
             if (string.IsNullOrWhiteSpace(persona.Nombre))
                 throw new ValidacionExcepcion("El nombre no puede estar vacío.");
@@ -20,12 +18,9 @@ namespace CentroEventos.Aplicacion.Validators
 
             if (string.IsNullOrWhiteSpace(persona.Email))
                 throw new ValidacionExcepcion("El email no puede estar vacío.");
-
-            if (_repoPersona.ExisteDNI(persona.DNI, persona.Id))
-                throw new DuplicadoException("El DNI ya está registrado.");
-
-            if (_repoPersona.ExisteEmail(persona.Email, persona.Id))
-                throw new DuplicadoException("El email ya está registrado.");
+            
+            if (!persona.Email.Contains('@'))
+                throw new ValidacionExcepcion("El email debe contener un '@'.");
         }
     }
 

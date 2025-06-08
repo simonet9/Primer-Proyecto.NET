@@ -1,28 +1,50 @@
-﻿@inherits LayoutComponentBase
+﻿@using CentroEventos.Aplicacion.Enum
+@using CentroEventos.Aplicacion.Interfaces
+@using CentroEventos.UI.Components.Pages.Shared
+@inherits LayoutComponentBase
+@inject IServicioAutorizacion ServicioAutorizacion
+@inject NavigationManager NavigationManager
+
 <MudThemeProvider />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudThemeProvider />
 
-<MudLayout>
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
-    </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
-        <MudDrawerHeader>
-            <MudText Typo="Typo.h5" Class="mt-1">Agus pedazo de puto ashee</MudText>
-        </MudDrawerHeader>
-        <NavMenu/>
-    </MudDrawer>
-    <MudMainContent>
-        @Body
-    </MudMainContent>
-</MudLayout>
+@if (_autorizado)
+{
+    <MudLayout>
+        <MudAppBar Elevation="1">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        </MudAppBar>
+        <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.h5" Class="mt-1">Aplicacion</MudText>
+            </MudDrawerHeader>
+            <NavMenu/>
+        </MudDrawer>
+        <MudMainContent>
+            @Body
+        </MudMainContent>
+    </MudLayout>
+}
+
 @code {
     bool _drawerOpen;
+    bool _autorizado;
+    private readonly Guid _usuarioActual = new("00000000-0000-0000-0000-000000000003"); // Esto es temporal, deberías obtenerlo de un servicio de autenticación
+
+    protected override void OnInitialized()
+    {
+        _autorizado = ServicioAutorizacion.PoseeElPermiso(_usuarioActual, Permiso.UsuarioAlta);
+        
+        if (!_autorizado)
+        {
+            NavigationManager.NavigateTo("/Login");
+        }
+    }
 
     void DrawerToggle()
     {

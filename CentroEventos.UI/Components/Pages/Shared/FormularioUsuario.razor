@@ -1,0 +1,113 @@
+﻿@using System.ComponentModel.DataAnnotations
+
+<MudForm @ref="formulario" Model="@modelo" Style="width: 100%;">
+    <MudStack Spacing="4">
+        <MudTextField T="string"
+                     Label="Correo Electrónico"
+                     @bind-Value="modelo.Email"
+                     Required="true"
+                     RequiredError="El correo es requerido"
+                     InputType="InputType.Email"
+                     Variant="Variant.Outlined"
+                     Adornment="Adornment.Start"
+                     AdornmentIcon="@Icons.Material.Filled.Email"
+                     AdornmentColor="Color.Primary"/>
+        
+        <MudTextField T="string"
+                     Label="Contraseña"
+                     @bind-Value="modelo.Password"
+                     Required="true"
+                     RequiredError="La contraseña es requerida"
+                     InputType="@(mostrarPassword ? InputType.Text : InputType.Password)"
+                     Variant="Variant.Outlined"
+                     Adornment="Adornment.End"
+                     AdornmentIcon="@(mostrarPassword ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"
+                     OnAdornmentClick="@(() => mostrarPassword = !mostrarPassword)"
+                     AdornmentColor="Color.Primary"
+                     AdornmentStartIcon="@Icons.Material.Filled.Lock" />
+        
+        @if (ShowRememberMe)
+        {
+            <MudCheckBox T="bool" 
+                        Label="Recordar sesión" 
+                        Color="Color.Primary"
+                        @bind-Checked="modelo.RecordarSesion"/>
+        }
+        
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Size="Size.Large"
+                   FullWidth="true"
+                   OnClick="ProcesarSubmit"
+                   DisableElevation="true"
+                   Disabled="procesando"
+                   Class="mt-4 py-3">
+            @if (procesando)
+            {
+                <MudProgressCircular Class="me-3"
+                                   Size="Size.Small"
+                                   Indeterminate="true"
+                                   Color="Color.Secondary"/>
+                <MudText>@ProcesoTexto</MudText>
+            }
+            else
+            {
+                <MudIcon Icon="@BotonSubmitIcono" Class="me-3"/>
+                <MudText>@BotonSubmitTexto</MudText>
+            }
+        </MudButton>
+        
+        @if (MostrarOlvidePassword)
+        {
+            <MudDivider Class="my-4"/>
+            <MudLink Href="@OlvidePasswordUrl" Underline="Underline.Always">
+                ¿Olvidaste tu contraseña?
+            </MudLink>
+        }
+    </MudStack>
+</MudForm>
+
+@code {
+    private MudForm? formulario;
+    private bool mostrarPassword;
+    private bool procesando;
+    private readonly UsuarioModel modelo = new();
+
+    [Parameter] public EventCallback<UsuarioModel> OnSubmit { get; set; }
+    [Parameter] public bool ShowRememberMe { get; set; }
+    [Parameter] public string BotonSubmitTexto { get; set; } = "Enviar";
+    [Parameter] public string BotonSubmitIcono { get; set; } = Icons.Material.Filled.Send;
+    [Parameter] public string ProcesoTexto { get; set; } = "Procesando...";
+    [Parameter] public bool MostrarOlvidePassword { get; set; }
+    [Parameter] public string OlvidePasswordUrl { get; set; } = "#";
+
+    private async Task ProcesarSubmit()
+    {
+        if (formulario is null) return;
+        
+        await formulario.Validate();
+        if (!formulario.IsValid) return;
+
+        procesando = true;
+        try
+        {
+            await OnSubmit.InvokeAsync(modelo);
+        }
+        finally
+        {
+            procesando = false;
+        }
+    }
+    public class UsuarioModel
+    {
+        [Required(ErrorMessage = "El correo es requerido")]
+        [EmailAddress(ErrorMessage = "Formato de correo inválido")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La contraseña es requerida")]
+        public string Password { get; set; } = string.Empty;
+    
+        public bool RecordarSesion { get; set; }
+    }
+}
+
