@@ -1,6 +1,13 @@
-﻿@page "/EditarUsuario"
-<h3>EditarUsuario</h3>
+﻿@page "/usuarios/editar"
+@using CentroEventos.Aplicacion.Entities
+@using CentroEventos.Aplicacion.Interfaces
+@using CentroEventos.Aplicacion.UseCases.Users
+@using CentroEventos.UI.Components.Pages.Shared
+@inject ModificarUsuarioUseCase ModificarUsuarioUseCase
+@inject IRepositorioUsuario RepoUsuario
+@inject NavigationManager NavigationManager
 
-@code {
-    
-}
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Editar Usuario</MudText>
+        <FormularioUsuario BotonSubmitTexto="Guardar" OnSubmit="Editar" />
+</MudPaper>

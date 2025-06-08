@@ -1,14 +1,16 @@
-﻿namespace CentroEventos.Repositorios.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
-public class CentroEventosSqlite
+namespace CentroEventos.Repositorios.Data;
+
+public static class CentroEventosSqlite
 {
-    public static void Inicializar()
+    public static void Inicializar(IServiceProvider serviceProvider)
     {
-        using var context = new MyContext();
+        using var context = serviceProvider.GetRequiredService<MyContext>();
         if (context.Database.EnsureCreated())
         {
             Console.WriteLine("Se creó base de datos");
         }
     }
-
 }

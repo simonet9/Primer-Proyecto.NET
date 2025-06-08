@@ -1,19 +1,29 @@
 using CentroEventos.UI.Components;
-using CentroEventos.Aplicacion.UseCases;
 using CentroEventos.Aplicacion.Interfaces;
 using CentroEventos.Aplicacion.Validators;
 using CentroEventos.Aplicacion.Service;
 using CentroEventos.Aplicacion.UseCases.Evento;
 using CentroEventos.Aplicacion.UseCases.Personas;
 using CentroEventos.Aplicacion.UseCases.Reservas;
+using CentroEventos.Aplicacion.UseCases.Users;
 using CentroEventos.Repositorios.Repos;
 using CentroEventos.Repositorios.Data;
-using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
-
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Database configuration
+// Configura la ruta de la base de datos
+var basePath = AppContext.BaseDirectory;
+var projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\..\"));
+var dataFolder = Path.Combine(projectPath, "Data");
+Directory.CreateDirectory(dataFolder);
+var dbPath = Path.Combine(dataFolder, "CentroEventos.sqlite");
+
+// Configura el contexto con la cadena de conexión
+builder.Services.AddDbContext<MyContext>(options =>
+    options.UseSqlite($"Data Source={dbPath}"));
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -24,7 +34,8 @@ builder.Services.AddScoped<IRepositorioEventoDeportivo, RepositorioEventoDeporti
 builder.Services.AddScoped<IRepositorioReserva, RepositorioReserva>();
 
 // Servicios
-builder.Services.AddSingleton<IServicioAutorizacion, ServicioAutorizacion>();
+builder.Services.AddScoped<IServicioAutorizacion, ServicioAutorizacion>();
+builder.Services.AddScoped<IServicioAutenticacion, ServicioAutenticacion>();
 
 // Validadores
 builder.Services.AddScoped<ValidadorReserva>();
@@ -48,28 +59,22 @@ builder.Services.AddScoped<ReservaAltaUseCase>();
 builder.Services.AddScoped<ModificarReservaUseCase>();
 builder.Services.AddScoped<ListarReservasUseCase>();
 builder.Services.AddScoped<EliminarReservaUseCase>();
-builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddMudServices();
 
 
+// Repositorios de usuarios
+builder.Services.AddScoped<RegistrarUsuarioUseCase>();
+builder.Services.AddScoped<RegistrarUsuarioUseCase>();
+builder.Services.AddScoped<ModificarUsuarioUseCase>();
+builder.Services.AddScoped<ListarUsuariosUseCase>();
+builder.Services.AddScoped<EliminarUsuarioUseCase>();
+
 builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
 var app = builder.Build();
-CentroEventosSqlite.Inicializar();
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<MyContext>();
-
-    context.Database.EnsureCreated();
-
-    var connection = context.Database.GetDbConnection();
-    connection.Open();
-    using (var command = connection.CreateCommand())
-    {
-        command.CommandText = "PRAGMA journal_mode=DELETE;";
-        command.ExecuteNonQuery();
-    }
+    CentroEventosSqlite.Inicializar(scope.ServiceProvider);
 }
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

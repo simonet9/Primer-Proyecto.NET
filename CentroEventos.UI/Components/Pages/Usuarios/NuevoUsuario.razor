@@ -1,6 +1,12 @@
-﻿@page "/NuevoUsuario"
-<h3>NuevoUsuario</h3>
+﻿@page "/usuarios/nuevo"
+@using CentroEventos.Aplicacion.UseCases.Users
+@using CentroEventos.UI.Components.Pages.Shared
+@inject RegistrarUsuarioUseCase AgregarUsuarioUseCase
+@inject NavigationManager NavigationManager
 
-@code {
-    
-}
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Nuevo Usuario</MudText>
+    <FormularioUsuario BotonSubmitTexto="Crear" OnSubmit="CrearUsuario" />
+</MudPaper>
+
+ 

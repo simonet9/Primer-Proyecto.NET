@@ -1,6 +1,61 @@
-﻿@page "/ListaPersonas"
-<h3>ListaSocios</h3>
+﻿@page "/personas"
+@using CentroEventos.Aplicacion.Entities
+@inject CentroEventos.Aplicacion.UseCases.Personas.ListarPersonasUseCase ListarPersonasUseCase
+
+<MudText Typo="Typo.h3" Class="mb-4">Personas registradas</MudText>
+
+@if (!string.IsNullOrEmpty(_error))
+{
+    <MudAlert Severity="Severity.Error">@_error</MudAlert>
+}
+else if (_personas.Count == 0)
+{
+    <MudAlert Severity="Severity.Info">No hay personas registradas.</MudAlert>
+}
+else
+{
+    <MudPaper Class="pa-4">
+        <MudTable Items="@_personas" Dense="true" Hover="true" Bordered="true" Striped="true">
+            <HeaderContent>
+                <MudTh>DNI</MudTh>
+                <MudTh>Nombre</MudTh>
+                <MudTh>Apellido</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Teléfono</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.DNI</MudTd>
+                <MudTd>@context.Nombre</MudTd>
+                <MudTd>@context.Apellido</MudTd>
+                <MudTd>@context.Email</MudTd>
+                <MudTd>@context.Telefono</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+}
 
 @code {
-    
+
+    private List<Persona> _personas = new()
+    {
+        new Persona("12345678A", "Juan", "Pérez", "juan@mail.com", "123456789"),
+        new Persona("87654321B", "María", "García", "maria@mail.com", "987654321"),
+        new Persona("11111111C", "Pedro", "López", "pedro@mail.com", "555555555")
+    };
+
+    private string? _error;
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            //_personas = ListarPersonasUseCase.Ejecutar();
+        }
+        catch (Exception ex)
+        {
+            _personas = new List<Persona>();
+            _error = ex.Message;
+        }
+    }
+
 }

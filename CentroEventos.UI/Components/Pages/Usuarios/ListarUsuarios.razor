@@ -1,6 +1,29 @@
-﻿@page "/ListarUsuarios"
-<h3>ListarUsuarios</h3>
+﻿@page "/usuarios/listar"
+@using CentroEventos.Aplicacion.Entities
+@using CentroEventos.Aplicacion.UseCases.Users
+@inject ListarUsuariosUseCase ListarUsuariosUseCase
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Usuarios</MudText>
+    <MudTable Items="_usuarios">
+        <HeaderContent>
+            <MudTh>Nombre</MudTh>
+            <MudTh>Apellido</MudTh>
+            <MudTh>Email</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Nombre</MudTd>
+            <MudTd>@context.Apellido</MudTd>
+            <MudTd>@context.Email</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
 
 @code {
-    
+    private List<Usuario> _usuarios = new();
+
+    protected override void OnInitialized()
+    {
+        _usuarios = ListarUsuariosUseCase.Ejecutar();
+    }
 }

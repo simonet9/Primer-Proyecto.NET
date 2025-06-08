@@ -1,6 +1,19 @@
 ﻿@page "/Registro"
-<h3>Registro</h3>
+@using CentroEventos.Aplicacion.UseCases.Users
+@using CentroEventos.UI.Components.Pages.Shared
+@inject RegistrarUsuarioUseCase RegistrarUsuarioUseCase
+@inject NavigationManager NavigationManager
 
-@code {
-    
-}
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 100vh;">
+    <MudPaper Elevation="25" Class="pa-8" Style="width: 500px; backdrop-filter: blur(10px); background-color: rgba(255,255,255,0.8);">
+        <MudStack Class="align-center" Spacing="4">
+            <MudText Typo="Typo.h4" Class="mb-4">Registro de Usuario</MudText>
+            <FormularioUsuario 
+                BotonSubmitTexto="Registrarse"
+                BotonSubmitIcono="@Icons.Material.Filled.PersonAdd"
+                ProcesoTexto="Registrando..."/>
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+
+

@@ -1,6 +1,53 @@
 ﻿@page "/"
-<h3>Index</h3>
-
-@code {
-    
-}
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-10">
+    <MudPaper Elevation="0" Class="p-8" Style="padding: 20px;background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+        <MudText Typo="Typo.h2" Align="Align.Center" Class="mb-2" Color="Color.Primary">
+            Centro de Eventos
+        </MudText>
+        <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-8" Color="Color.Secondary">
+            Administra usuarios, personas, eventos y reservas desde un solo lugar.
+        </MudText>
+        <MudGrid Gutter="4">
+            <MudItem xs="12" sm="6">
+                <MudCard Style="height: 100%;">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h5">Usuarios</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        Administra los usuarios del sistema.
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudCard Style="height: 100%;">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h5">Personas</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        Gestiona las personas registradas.
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudCard Style="height: 100%;">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h5">Eventos</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        Consulta y administra los eventos.
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudCard Style="height: 100%;">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h5">Reservas</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        Visualiza y gestiona las reservas.
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</MudContainer>

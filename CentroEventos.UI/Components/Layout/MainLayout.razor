@@ -2,6 +2,7 @@
 @using CentroEventos.Aplicacion.Interfaces
 @using CentroEventos.UI.Components.Pages.Shared
 @inherits LayoutComponentBase
+@inject IServicioAutenticacion ServicioAutenticacion
 @inject IServicioAutorizacion ServicioAutorizacion
 @inject NavigationManager NavigationManager
 
@@ -11,8 +12,6 @@
 <MudSnackbarProvider />
 <MudThemeProvider />
 
-@if (_autorizado)
-{
     <MudLayout>
         <MudAppBar Elevation="1">
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
@@ -29,23 +28,10 @@
             @Body
         </MudMainContent>
     </MudLayout>
-}
 
 @code {
     bool _drawerOpen;
-    bool _autorizado;
-    private readonly Guid _usuarioActual = new("00000000-0000-0000-0000-000000000003"); // Esto es temporal, deberías obtenerlo de un servicio de autenticación
-
-    protected override void OnInitialized()
-    {
-        _autorizado = ServicioAutorizacion.PoseeElPermiso(_usuarioActual, Permiso.UsuarioAlta);
-        
-        if (!_autorizado)
-        {
-            NavigationManager.NavigateTo("/Login");
-        }
-    }
-
+    
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;

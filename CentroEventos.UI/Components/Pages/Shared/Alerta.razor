@@ -1,5 +1,13 @@
-﻿<h3>Alerta</h3>
+﻿@using MudBlazor
+
+@if (!string.IsNullOrWhiteSpace(Mensaje))
+{
+    <MudAlert Severity="@Severidad" Elevation="2" Dense="true" Class="my-2">
+        @Mensaje
+    </MudAlert>
+}
 
 @code {
-    
+    [Parameter] public string? Mensaje { get; set; }
+    [Parameter] public Severity Severidad { get; set; } = Severity.Info;
 }

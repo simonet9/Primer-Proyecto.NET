@@ -1,6 +1,62 @@
 ﻿@page "/ListaEventos"
-<h3>ListaEventos</h3>
+@using CentroEventos.Aplicacion.Entities
+@using CentroEventos.Aplicacion.UseCases.Evento
+@inject ListarEventosDeportivoUseCase ListarEventosDeportivoUseCase
+@using MudBlazor
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h3" Class="mb-4">Eventos Deportivos</MudText>
+    @if (_mensajeError is not null)
+    {
+        <MudAlert Severity="Severity.Error">@_mensajeError</MudAlert>
+    }
+    else if (_eventos is null)
+    {
+        <MudProgressCircular Indeterminate="true"/>
+    }
+    else
+    {
+        <MudTable Items="_eventos" Dense="true" Hover="true" Bordered="true" Striped="true">
+            <HeaderContent>
+                <MudTh>Nombre</MudTh>
+                <MudTh>Descripción</MudTh>
+                <MudTh>Fecha y Hora</MudTh>
+                <MudTh>Duración (h)</MudTh>
+                <MudTh>Cupo Máximo</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Nombre</MudTd>
+                <MudTd>@context.Descripcion</MudTd>
+                <MudTd>@context.FechaHoraInicio.ToString("g")</MudTd>
+                <MudTd>@context.DuracionHoras</MudTd>
+                <MudTd>@context.CupoMaximo</MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</MudPaper>
 
 @code {
-    
+
+    private List<EventoDeportivo>? _eventos = new()
+    {
+        new EventoDeportivo("Partido de Fútbol", "Partido amistoso", DateTime.Now.AddDays(1), 2, 22, Guid.NewGuid()),
+        new EventoDeportivo("Torneo de Tenis", "Torneo individual", DateTime.Now.AddDays(7), 4, 16, Guid.NewGuid())
+    };
+
+    private string? _mensajeError;
+
+    protected override Task OnInitializedAsync()
+    {
+        try
+        {
+            //_eventos = ListarEventosDeportivoUseCase.Ejecutar();
+        }
+        catch (Exception ex)
+        {
+            _mensajeError = ex.Message;
+        }
+
+        return Task.CompletedTask;
+    }
+
 }

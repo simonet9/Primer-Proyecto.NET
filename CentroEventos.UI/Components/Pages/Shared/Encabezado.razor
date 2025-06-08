@@ -1,5 +1,14 @@
-﻿<h3>Encabezado</h3>
+﻿<MudAppBar Elevation="4" Color="Color.Primary">
+    <MudText Typo="Typo.h6" Class="ml-2">@Titulo</MudText>
+    <MudSpacer />
+    @if (!string.IsNullOrWhiteSpace(Usuario))
+    {
+        <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Class="mr-1" />
+        <MudText Typo="Typo.subtitle2">@Usuario</MudText>
+    }
+</MudAppBar>
 
 @code {
-    
+    [Parameter] public string Titulo { get; set; } = "Centro de Eventos";
+    [Parameter] public string? Usuario { get; set; }
 }

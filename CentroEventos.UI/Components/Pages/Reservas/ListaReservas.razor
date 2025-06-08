@@ -1,6 +1,63 @@
 ﻿@page "/ListaReservas"
-<h3>ListaReservas</h3>
+@using CentroEventos.Aplicacion.Entities
+@using CentroEventos.Aplicacion.Enum
+@using CentroEventos.Aplicacion.UseCases.Reservas
+@inject ListarReservasUseCase ListarReservasUseCase
+
+<MudPaper Class="pa-4 mx-auto" Style="max-width: 1000px;">
+    <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4">Reservas</MudText>
+    @if (_mensajeError is not null)
+    {
+        <MudAlert Severity="Severity.Error">@_mensajeError</MudAlert>
+    }
+    else if (_reservas is null)
+    {
+        <MudProgressCircular Indeterminate="true" Class="d-flex justify-center"/>
+    }
+    else
+    {
+        <MudTable Items="_reservas" Hover="true" Striped="true" Dense="true">
+            <HeaderContent>
+                <MudTh>Persona</MudTh>
+                <MudTh>Evento</MudTh>
+                <MudTh>Fecha Reserva</MudTh>
+                <MudTh>Estado</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Id</MudTd>
+                <MudTd>@context.EventoDeportivoId</MudTd>
+                <MudTd>@context.FechaAltaReserva</MudTd>
+                <MudTd>@context.EstadoAsistencia</MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</MudPaper>
 
 @code {
-    
+    private List<Reserva>? _reservas;
+    private string? _mensajeError;
+
+    protected override Task OnInitializedAsync()
+    {
+        try
+        {
+            _reservas = new List<Reserva>
+            {
+                new Reserva(
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    DateTime.Now,
+                    Estado.Pendiente
+                )
+            };
+
+            
+        }
+        catch (Exception ex)
+        {
+            _mensajeError = ex.Message;
+        }
+
+        return Task.CompletedTask;
+    }
 }

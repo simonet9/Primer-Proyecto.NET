@@ -19,7 +19,7 @@ public class RegistrarUsuarioUseCase(
 
         // Sí es el primer usuario del sistema, asignarle todos los permisos
         if (!repoUsuario.ExisteAlguno())
-        {
+        {   
             foreach (var p in System.Enum.GetValues<Permiso>())
                 nuevoUsuario.Permisos.Add(p);
         }
