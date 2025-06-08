@@ -1,0 +1,6 @@
+Shared
+├── NavMenu.razor              ← Menú lateral (según permisos)
+├── Encabezado.razor           ← Header superior con logout
+├── FormularioUsuario.razor    ← Formulario reutilizable
+├── Alerta.razor               ← Componente para mostrar mensajes
+└── AutorizacionView.razor     ← Wrapper que muestra o no contenido según permisos
