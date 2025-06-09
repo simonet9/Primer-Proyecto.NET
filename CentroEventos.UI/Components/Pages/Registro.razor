@@ -1,19 +1,47 @@
 ﻿@page "/Registro"
 @using CentroEventos.Aplicacion.UseCases.Users
+@using CentroEventos.UI.Components.Layout
 @using CentroEventos.UI.Components.Pages.Shared
 @inject RegistrarUsuarioUseCase RegistrarUsuarioUseCase
 @inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@layout LoginLayout
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 100vh;">
     <MudPaper Elevation="25" Class="pa-8" Style="width: 500px; backdrop-filter: blur(10px); background-color: rgba(255,255,255,0.8);">
         <MudStack Class="align-center" Spacing="4">
             <MudText Typo="Typo.h4" Class="mb-4">Registro de Usuario</MudText>
             <FormularioUsuario 
-                BotonSubmitTexto="Registrarse"
-                BotonSubmitIcono="@Icons.Material.Filled.PersonAdd"
-                ProcesoTexto="Registrando..."/>
+                TipoFormulario="registro"
+                OnSubmitCallback="OnRegistroExitoso"
+                OnError="OnRegistroError"/>
+            
+            <MudDivider Class="my-4"/>
+            
+            <MudButton Variant="Variant.Text" 
+                       Color="Color.Primary"
+                       OnClick="IrALogin">
+                ¿Ya tienes cuenta? Inicia sesión aquí
+            </MudButton>
         </MudStack>
     </MudPaper>
 </MudContainer>
 
+@code {
+    private void IrALogin()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
 
+    private async Task OnRegistroExitoso()
+    {
+        Snackbar.Add("Registro exitoso", Severity.Success);
+        await Task.Delay(1000); // Dar tiempo para mostrar el mensaje
+        NavigationManager.NavigateTo("/login");
+    }
+
+    private void OnRegistroError(string mensaje)
+    {
+        Snackbar.Add(mensaje, Severity.Error);
+    }
+}

@@ -1,49 +1,144 @@
 ﻿@using System.ComponentModel.DataAnnotations
+@inject ISnackbar Snackbar
 
-<MudForm Style="width: 100%;">
-    <MudStack Spacing="4">
-        <MudTextField T="string"
-                      Label="Nombre" 
-                      Required="true"
-                      RequiredError="El nombre es requerido"
-                      Variant="Variant.Outlined"
-                      Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Filled.Person"
-                      AdornmentColor="Color.Primary"/>
-        <MudTextField T="string"
-                      Label="Apellido"
-                      Required="true"
-                      RequiredError="El apellido es requerido"
-                      Variant="Variant.Outlined"
-                      Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Filled.Person"
-                      AdornmentColor="Color.Primary"/>
-        <MudTextField T="string"
-                      Label="Correo Electrónico"
-                      Required="true"
-                      RequiredError="El correo es requerido"
-                      InputType="InputType.Email"
-                      Variant="Variant.Outlined"
-                      Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Filled.Email"
-                      AdornmentColor="Color.Primary"/>
-        <MudTextField T="string"
-                      Label="Contraseña"
-                      Required="true"
-                      RequiredError="La contraseña es requerida"
-                      Variant="Variant.Outlined"
-                      Adornment="Adornment.End"
-                      AdornmentColor="Color.Primary"
-                      AdornmentStartIcon="@Icons.Material.Filled.Lock" />
-            <MudCheckBox T="bool" 
-                         Label="Recordar sesión" 
-                         Color="Color.Primary"/>
-        <MudButton Variant="Variant.Filled"
-                   Color="Color.Primary"
-                   Size="Size.Large"
-                   FullWidth="true"
-                   DisableElevation="true"
-                   Class="mt-4 py-3">
-        </MudButton>
-    </MudStack>
-</MudForm>
+<MudPaper Elevation="25" Class="pa-8 mx-auto form-paper">
+    <MudForm @ref="_form" Model="_modelo" @bind-IsValid="_isValid">
+        <MudStack Spacing="4">
+
+            @if (TipoFormulario == "registro")
+            {
+                <MudTextField T="string" @bind-Value="_modelo.Nombre" Label="Nombre" Required="true"
+                              RequiredError="El nombre es requerido" Variant="Variant.Text"
+                              Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person"
+                              AdornmentColor="Color.Primary"
+                              Class="input-field"/>
+
+                <MudTextField T="string" @bind-Value="_modelo.Apellido" Label="Apellido" Required="true"
+                              RequiredError="El apellido es requerido" Variant="Variant.Text"
+                              Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person"
+                              AdornmentColor="Color.Primary"
+                              Class="input-field"/>
+            }
+
+            <MudTextField T="string" @bind-Value="_modelo.Email" Label="Correo Electrónico" Required="true"
+                          RequiredError="El correo es requerido" Variant="Variant.Text"
+                          InputType="InputType.Email" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Email" AdornmentColor="Color.Primary"
+                          Class="input-field"/>
+
+            <MudTextField T="string" @bind-Value="_modelo.Password" Label="Contraseña" Required="true"
+                          RequiredError="La contraseña es requerida" Variant="Variant.Text"
+                          InputType="@(_verPassword ? InputType.Text : InputType.Password)"
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@(_verPassword ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"
+                          OnAdornmentClick="() => _verPassword = !_verPassword"
+                          AdornmentColor="Color.Primary"
+                          Class="input-field"/>
+
+            @if (TipoFormulario == "login")
+            {
+                <MudCheckBox T="bool" @bind-Checked="_modelo.RecordarSesion" Label="Recordar sesión"
+                             Color="Color.Primary" Class="mt-2"/>
+            }
+
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large"
+                       OnClick="ProcesarFormulario" Disabled="_procesando" Class="mt-4 submit-button">
+                @if (_procesando)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2"/>
+                    @MensajeProceso
+                }
+                else
+                {
+                    @TextoBoton
+                }
+            </MudButton>
+        </MudStack>
+    </MudForm>
+</MudPaper>
+
+<style>
+    .form-paper {
+        max-width: 500px;
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .input-field {
+        transition: all 0.3s ease;
+    }
+
+    .input-field:hover {
+        transform: translateY(-2px);
+    }
+
+    .submit-button {
+        border-radius: 8px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .submit-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+@code {
+    [Parameter] public string TipoFormulario { get; set; } = "login";
+    [Parameter] public EventCallback<(string Email, string Password)> OnSubmitCallback { get; set; }
+    [Parameter] public EventCallback<string> OnError { get; set; }
+
+    private MudForm _form = null!;
+    private bool _isValid, _procesando, _verPassword;
+
+    private FormularioModel _modelo = new();
+
+    private string TextoBoton => TipoFormulario == "login" ? "Iniciar Sesión" : "Registrarse";
+    private string MensajeProceso => TipoFormulario == "login" ? "Iniciando sesión..." : "Registrando...";
+
+    private async Task ProcesarFormulario()
+    {
+        await _form.Validate();
+        if (!_isValid) return;
+
+        try
+        {
+            _procesando = true;
+            await OnSubmitCallback.InvokeAsync((_modelo.Email, _modelo.Password));
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _procesando = false;
+        }
+    }
+
+    private class FormularioModel
+    {
+        [Required(ErrorMessage = "El nombre es requerido")]
+        public string Nombre { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El apellido es requerido")]
+        public string Apellido { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El correo es requerido")]
+        [EmailAddress(ErrorMessage = "El correo no es válido")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La contraseña es requerida")]
+        [MinLength(6, ErrorMessage = "Debe tener al menos 6 caracteres")]
+        public string Password { get; set; } = string.Empty;
+
+        public bool RecordarSesion { get; set; }
+    }
+
+}

@@ -1,0 +1,76 @@
+﻿@page "/"
+@using CentroEventos.UI.Components.Layout
+@using CentroEventos.UI.Components.Pages
+
+@code {
+    private Task MostrarFormulario(string registro)
+    {
+        NavigationManager.NavigateTo($"/{registro}");
+        
+        return Task.CompletedTask;
+    }
+}
+@inject NavigationManager NavigationManager
+@layout LoginLayout
+
+<PageTitle>Bienvenida - Centro de Eventos</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex flex-column justify-center align-center min-vh-100">
+    <MudPaper Elevation="3" Class="pa-8 welcome-paper">
+        <MudStack Row="false" Spacing="4" AlignItems="AlignItems.Center">
+            <MudIcon Icon="@Icons.Material.Filled.Event" Color="Color.Primary" Size="Size.Large" Style="width: 64px; height: 64px;" />
+            
+            <MudText Typo="Typo.h3" Align="Align.Center" Color="Color.Primary" Class="welcome-title">
+                ¡Bienvenido a Centro de Eventos!
+            </MudText>
+            
+            <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-6" Style="max-width: 600px;">
+                Gestiona tus eventos deportivos de manera fácil y segura.
+            </MudText>
+            <MudPaper Elevation="0" Class="pa-4">
+                <MudStack Row="true" Spacing="3" JustifyContent="Center">
+                    <MudButton Variant="Variant.Filled" 
+                             Color="Color.Primary" 
+                             Size="Size.Large"
+                             OnClick='() => MostrarFormulario("Login")'
+                             StartIcon="Icons.Material.Filled.Login"
+                             Class="px-6">
+                        Iniciar sesión
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined" 
+                             Color="Color.Secondary" 
+                             Size="Size.Large"
+                             OnClick='() => MostrarFormulario("Registro")'
+                             StartIcon="Icons.Material.Filled.AppRegistration"
+                             Class="px-6">
+                        Registrarse
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+
+<style>
+    .welcome-paper {
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        max-width: 800px;
+        margin: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .welcome-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-container {
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+</style>

@@ -1,5 +1,0 @@
-﻿
-Consultar
-● Las validaciones realizadas para la modificación de las reservas debe hacerlas el
-validador y, al igual que con la búsqueda de la persona y evento a modificar, la
-búsqueda de la reserva debe hacerse en el caso de uso correspondiente.

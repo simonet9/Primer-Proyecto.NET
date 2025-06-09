@@ -35,7 +35,6 @@ builder.Services.AddScoped<IRepositorioReserva, RepositorioReserva>();
 
 // Servicios
 builder.Services.AddScoped<IServicioAutorizacion, ServicioAutorizacion>();
-builder.Services.AddScoped<IServicioAutenticacion, ServicioAutenticacion>();
 
 // Validadores
 builder.Services.AddScoped<ValidadorReserva>();

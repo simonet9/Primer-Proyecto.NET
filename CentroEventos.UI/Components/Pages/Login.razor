@@ -3,8 +3,8 @@
 @using CentroEventos.UI.Components.Layout
 @using CentroEventos.UI.Components.Pages.Shared
 @inject Aplicacion.Interfaces.IRepositorioUsuario RepoUsuario
-@inject CentroEventos.Aplicacion.Interfaces.IServicioAutenticacion ServicioAutenticacion
 @inject NavigationManager Navigation
+@inject ISnackbar Snackbar
 @layout LoginLayout
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 100vh;">
@@ -15,11 +15,17 @@
             </MudAvatar>
             <MudText Typo="Typo.h4" Class="mb-4">Bienvenido</MudText>
             <FormularioUsuario
-                ShowRememberMe="true"
-                BotonSubmitTexto="Iniciar Sesión"
-                BotonSubmitIcono="@Icons.Material.Filled.Login"
-                ProcesoTexto="Iniciando sesión..."
-                MostrarOlvidePassword="true" />
+                TipoFormulario="login"
+                OnSubmitCallback="OnLoginExitoso"
+                OnError="OnLoginError" />
+            
+            <MudDivider Class="my-4"/>
+            
+            <MudButton Variant="Variant.Text" 
+                       Color="Color.Primary"
+                       OnClick="IrARegistro">
+                ¿No tienes cuenta? Regístrate aquí
+            </MudButton>
         </MudStack>
     </MudPaper>
 </MudContainer>
@@ -35,3 +41,37 @@
         height: 80px;
     }
 </style>
+
+@code {
+
+    private void IrARegistro()
+    {
+        Navigation.NavigateTo("/registro");
+    }
+
+    private async Task OnLoginExitoso((string Email, string Password) datos)
+    {
+        var usuario = RepoUsuario.ObtenerPorEmail(datos.Email);
+
+        if (usuario == null)
+        {
+            Snackbar.Add("Usuario no encontrado.", Severity.Error);
+            return;
+        }
+
+        if (usuario.Contrasena != datos.Password)
+        {
+            Snackbar.Add("Contraseña incorrecta.", Severity.Error);
+            return;
+        }
+
+        Snackbar.Add("Inicio de sesión exitoso", Severity.Success);
+        await Task.Delay(1000);
+        Navigation.NavigateTo("/Index", true);
+    }
+    
+    private void OnLoginError(string mensaje)
+    {
+        Snackbar.Add(mensaje, Severity.Error);
+    }
+}
