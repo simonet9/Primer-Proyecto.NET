@@ -2,30 +2,48 @@
 using CentroEventos.Aplicacion.Interfaces;
 using CentroEventos.Aplicacion.Validators;
 using CentroEventos.Aplicacion.Entities;
+using CentroEventos.Aplicacion.Exceptions;
 
 namespace CentroEventos.Aplicacion.UseCases.Users;
 
-public class RegistrarUsuarioUseCase(
-    IRepositorioUsuario repoUsuario,
-    IServicioAutorizacion auth)
-    : UseCaseConAutorizacion(auth)
+public class RegistrarUsuarioUseCase(IRepositorioUsuario repoUsuario)
 {
     public void Ejecutar(string nombre, string apellido, string email, string password)
     {
-        // Validar los datos del usuario
-        ValidadorUsuario.Validar(nombre, apellido, password, email);
-        // Crear nuevo usuario
-        var nuevoUsuario = new Usuario(nombre, apellido, email, password);
+        try
+        {
+            ValidadorUsuario.Validar(nombre, apellido, password, email);
 
-        // Sí es el primer usuario del sistema, asignarle todos los permisos
-        if (!repoUsuario.ExisteAlguno())
-        {   
-            foreach (var p in System.Enum.GetValues<Permiso>())
-                nuevoUsuario.Permisos.Add(p);
+            if (repoUsuario.ObtenerPorEmail(email) != null)
+            {
+                throw new DuplicadoException("Ya existe un usuario con ese email");
+            }
+
+            var nuevoUsuario = new Usuario(nombre, apellido, email, password);
+
+            if (!repoUsuario.ExisteAlguno())
+            {
+                foreach (var p in System.Enum.GetValues<Permiso>())
+                {
+                    nuevoUsuario.Permisos.Add(p);
+                }
+            }
+
+            // Agregar el usuario y guardar cambios
+            repoUsuario.Agregar(nuevoUsuario);
+            repoUsuario.GuardarCambios();
         }
-        ValidarAutorizacion(nuevoUsuario.Id, Permiso.UsuarioAlta);
-        // Agregar el usuario al repositorio y guardar cambios
-        repoUsuario.Agregar(nuevoUsuario);
-        repoUsuario.GuardarCambios();
+        catch (DuplicadoException)
+        {
+            throw;
+        }
+        catch (ValidacionExcepcion)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            throw new OperacionInvalidaException("Error al registrar el usuario");
+        }
     }
 }

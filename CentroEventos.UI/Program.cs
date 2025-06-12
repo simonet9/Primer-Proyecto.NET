@@ -10,6 +10,7 @@ using CentroEventos.Repositorios.Repos;
 using CentroEventos.Repositorios.Data;
 using MudBlazor.Services;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,7 +59,21 @@ builder.Services.AddScoped<ReservaAltaUseCase>();
 builder.Services.AddScoped<ModificarReservaUseCase>();
 builder.Services.AddScoped<ListarReservasUseCase>();
 builder.Services.AddScoped<EliminarReservaUseCase>();
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
+    
+    config.SnackbarConfiguration.PreventDuplicates = false;
+    config.SnackbarConfiguration.NewestOnTop = false;
+    config.SnackbarConfiguration.ShowCloseIcon = true;
+    config.SnackbarConfiguration.VisibleStateDuration = 3000;
+    config.SnackbarConfiguration.HideTransitionDuration = 500;
+    config.SnackbarConfiguration.ShowTransitionDuration = 500;
+    
+    config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+    
+    config.PopoverOptions.ThrowOnDuplicateProvider = false;
+});
 
 
 // Repositorios de usuarios

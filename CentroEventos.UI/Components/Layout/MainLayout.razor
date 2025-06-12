@@ -1,5 +1,4 @@
-﻿@using CentroEventos.Aplicacion.Enum
-@using CentroEventos.Aplicacion.Interfaces
+﻿@using CentroEventos.Aplicacion.Interfaces
 @using CentroEventos.UI.Components.Pages.Shared
 @inherits LayoutComponentBase
 @inject IServicioAutorizacion ServicioAutorizacion
@@ -13,11 +12,14 @@
 
     <MudLayout>
         <MudAppBar Elevation="1">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            @if (!EsPaginaSinMenu)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            }
             <MudSpacer />
             <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
         </MudAppBar>
-        <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
+        <MudDrawer @bind-Open="_drawerOpen" Elevation="2" Variant="@(EsPaginaSinMenu ? DrawerVariant.Temporary : DrawerVariant.Responsive)">
             <MudDrawerHeader>
                 <MudText Typo="Typo.h5" Class="mt-1">Aplicacion</MudText>
             </MudDrawerHeader>
@@ -31,8 +33,28 @@
 @code {
     bool _drawerOpen;
     
+    private bool EsPaginaSinMenu
+    {
+        get
+        {
+            var rutaActual = NavigationManager.Uri.ToLower();
+            return rutaActual.EndsWith("/") || 
+                   rutaActual.EndsWith("/login") || 
+                   rutaActual.EndsWith("/registro");
+        }
+    }
+    
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    protected override void OnInitialized()
+    {
+        if (EsPaginaSinMenu)
+        {
+            _drawerOpen = false;
+        }
+        base.OnInitialized();
     }
 }
