@@ -3,6 +3,7 @@ using CentroEventos.Aplicacion.Interfaces;
 using CentroEventos.Aplicacion.Validators;
 using CentroEventos.Aplicacion.Entities;
 using CentroEventos.Aplicacion.Exceptions;
+using CentroEventos.Aplicacion.Helpers;
 
 namespace CentroEventos.Aplicacion.UseCases.Users;
 
@@ -18,32 +19,24 @@ public class RegistrarUsuarioUseCase(IRepositorioUsuario repoUsuario)
             {
                 throw new DuplicadoException("Ya existe un usuario con ese email");
             }
+            var hashPassword = HashHelper.CalcularHash(password);
+            var usuario = new Usuario(nombre, apellido, email, hashPassword);
 
-            var nuevoUsuario = new Usuario(nombre, apellido, email, password);
 
             if (!repoUsuario.ExisteAlguno())
             {
                 foreach (var p in System.Enum.GetValues<Permiso>())
                 {
-                    nuevoUsuario.Permisos.Add(p);
+                    usuario.Permisos.Add(p);
                 }
             }
 
-            // Agregar el usuario y guardar cambios
-            repoUsuario.Agregar(nuevoUsuario);
+            repoUsuario.Agregar(usuario);
             repoUsuario.GuardarCambios();
         }
-        catch (DuplicadoException)
+        catch (Exception ex)
         {
-            throw;
-        }
-        catch (ValidacionExcepcion)
-        {
-            throw;
-        }
-        catch (Exception)
-        {
-            throw new OperacionInvalidaException("Error al registrar el usuario");
+            throw new OperacionInvalidaException(ex.Message);
         }
     }
 }

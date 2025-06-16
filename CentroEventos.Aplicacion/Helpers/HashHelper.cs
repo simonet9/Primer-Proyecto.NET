@@ -15,4 +15,10 @@ public static class HashHelper
 
         return sb.ToString();
     }
+
+    public static bool VerificarPassword(string password, string hashAlmacenado)
+    {
+        var hashIngresado = CalcularHash(password);
+        return hashIngresado == hashAlmacenado;
+    }
 }

@@ -13,7 +13,7 @@ public class ModificarUsuarioUseCase(
     public void Ejecutar(Usuario usuario, Guid usuarioModificadorId)
     {
         ValidarAutorizacion(usuarioModificadorId, Permiso.UsuarioModificacion);
-        ValidadorUsuario.Validar(usuario.Nombre, usuario.Apellido, usuario.Contrasena, usuario.Email);
+        ValidadorUsuario.Validar(usuario.Nombre, usuario.Apellido, usuario.HashPassword, usuario.Email);
         repoUsuario.Actualizar(usuario);
         repoUsuario.GuardarCambios();
     }

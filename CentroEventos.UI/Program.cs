@@ -14,8 +14,12 @@ using MudBlazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 // Database configuration
 // Configura la ruta de la base de datos
+
+//cambiar esto 
 var basePath = AppContext.BaseDirectory;
 var projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\..\"));
 var dataFolder = Path.Combine(projectPath, "Data");
@@ -25,6 +29,8 @@ var dbPath = Path.Combine(dataFolder, "CentroEventos.sqlite");
 // Configura el contexto con la cadena de conexión
 builder.Services.AddDbContext<MyContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
+
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -36,6 +42,7 @@ builder.Services.AddScoped<IRepositorioReserva, RepositorioReserva>();
 
 // Servicios
 builder.Services.AddScoped<IServicioAutorizacion, ServicioAutorizacion>();
+builder.Services.AddScoped<UsuarioLogueado>();
 
 // Validadores
 builder.Services.AddScoped<ValidadorReserva>();

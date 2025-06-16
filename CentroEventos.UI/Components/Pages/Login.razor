@@ -1,0 +1,70 @@
+﻿@page "/Login"
+@using CentroEventos.Aplicacion.Helpers
+@using CentroEventos.Aplicacion.Service
+@using CentroEventos.UI.Components.Pages.Shared
+@inject Aplicacion.Interfaces.IRepositorioUsuario RepoUsuario
+@inject NavigationManager Navigation
+@inject UsuarioLogueado UsuarioLogueado
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="login-container d-flex justify-center align-center" Style="margin-top: 20px">
+    <MudPaper Elevation="6" Class="login-card pa-6">
+        <MudGrid>
+            <!-- Formulario de login -->
+            <MudItem xs="12" md="6" Class="login-form-side pe-md-4">
+                <MudPaper Elevation="0" Class="pa-4" Style="background-color: transparent;">
+                    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">
+                        <MudIcon Icon="@Icons.Material.Filled.Lock" Class="me-2" />
+                        Iniciar Sesión
+                    </MudText>
+
+                    <FormularioUsuario 
+                        TipoFormulario="login"
+                        OnLoginCallback="OnLoginExitoso"
+                        OnError="@MostrarError" />
+                </MudPaper>
+            </MudItem>
+
+            <!-- Mensaje lateral con botón de redirección -->
+            <MudItem xs="12" md="6" Class="d-flex align-center login-info-side">
+                <div class="d-flex flex-column align-center py-8 px-4 w-100">
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-3">
+                        ¿No tienes una cuenta?
+                    </MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-4 px-2">
+                        Regístrate y comienza a disfrutar de nuestros servicios.
+                    </MudText>
+                    <MudButton Href="/Registro" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Large">
+                        Registrarse
+                    </MudButton>
+                </div>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private async Task OnLoginExitoso((string Email, string Password) datos)
+    {
+        var usuario = RepoUsuario.ObtenerPorEmail(datos.Email);
+
+        if (usuario == null)
+        {
+            MostrarError("Usuario no encontrado.");
+            return;
+        }
+
+        if (!HashHelper.VerificarPassword(datos.Password, usuario.HashPassword))
+        {
+            MostrarError("Contraseña incorrecta.");
+            return;
+        }
+
+        UsuarioLogueado.SetUsuario(usuario);
+        Snackbar.Add("Inicio de sesión exitoso", Severity.Success);
+        await Task.Delay(1500);
+        Navigation.NavigateTo("/Index", true);
+    }
+
+    private void MostrarError(string mensaje) => Snackbar.Add(mensaje, Severity.Error);
+}

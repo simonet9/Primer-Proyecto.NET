@@ -11,7 +11,7 @@ namespace CentroEventos.Aplicacion.Validators
             if (string.IsNullOrWhiteSpace(evento.Nombre))
                 throw new ValidacionExcepcion("El nombre del evento no puede estar vacío.");
 
-            if (string.IsNullOrWhiteSpace(evento.Descripcion))
+            if (string.IsNullOrWhiteSpace(evento.Description))
                 throw new ValidacionExcepcion("La descripción no puede estar vacía.");
 
             if (evento.FechaHoraInicio < DateTime.Now)
@@ -20,7 +20,7 @@ namespace CentroEventos.Aplicacion.Validators
             if (evento.CupoMaximo <= 0)
                 throw new ValidacionExcepcion("El cupo máximo debe ser mayor que cero.");
 
-            if (evento.DuracionHoras <= 0)
+            if (evento.DurationHoras <= 0)
                 throw new ValidacionExcepcion("La duración debe ser mayor que cero.");
         }
     }

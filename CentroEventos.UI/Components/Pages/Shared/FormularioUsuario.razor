@@ -36,15 +36,6 @@
                           OnAdornmentClick="() => _verPassword = !_verPassword"
                           AdornmentColor="@(TipoFormulario == "login" ? Color.Primary : Color.Secondary)" />
         </MudItem>
-
-        @if (TipoFormulario == "login")
-        {
-            <MudItem xs="12">
-                <MudCheckBox T="bool" @bind-Checked="_modelo.RecordarSesion"
-                             Label="Recordar sesión" Color="Color.Primary" />
-            </MudItem>
-        }
-
         <MudItem xs="12">
             <MudButton Variant="Variant.Filled"
                        Color="@(TipoFormulario == "login" ? Color.Primary : Color.Secondary)"
@@ -68,27 +59,6 @@
     </MudGrid>
 </MudForm>
 
-<style>
-    .mud-input-control {
-        transition: transform 0.2s ease;
-    }
-
-    .mud-input-control:focus-within {
-        transform: translateY(-2px);
-    }
-
-    .mud-button {
-        border-radius: 8px;
-        font-weight: 500;
-        letter-spacing: 1px;
-        transition: all 0.3s ease;
-    }
-
-    .mud-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-</style>
 
 @code {
     [Parameter] public string TipoFormulario { get; set; } = "login";
@@ -149,6 +119,5 @@
         [MinLength(6, ErrorMessage = "Debe tener al menos 6 caracteres")]
         public string Password { get; set; } = string.Empty;
 
-        public bool RecordarSesion { get; set; }
     }
 }

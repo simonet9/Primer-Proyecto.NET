@@ -5,10 +5,10 @@ namespace CentroEventos.Aplicacion.Entities;
 public class Reserva
 {
 public Guid Id { get; protected set; } = Guid.NewGuid();
-public Guid PersonaId { get; protected set; }
-public Guid EventoDeportivoId { get; protected set; }
-public DateTime FechaAltaReserva { get; set; }
-public Estado EstadoAsistencia { get; set; }
+public Guid PersonaId { get; protected set; } = Guid.Empty;
+public Guid EventoDeportivoId { get; protected set; } = Guid.Empty;
+public DateTime FechaAltaReserva { get; set; } = DateTime.Now;
+public Estado EstadoAsistencia { get; set; } = Estado.Pendiente;
 
 public Reserva(Guid personaId, Guid eventoDeportivoId, DateTime fechaAltaReserva, Estado estadoAsistencia)
 {

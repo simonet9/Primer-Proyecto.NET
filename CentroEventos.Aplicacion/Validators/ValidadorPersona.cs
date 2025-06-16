@@ -13,7 +13,7 @@ namespace CentroEventos.Aplicacion.Validators
             if (string.IsNullOrWhiteSpace(persona.Apellido))
                 throw new ValidacionExcepcion("El apellido no puede estar vacío.");
 
-            if (string.IsNullOrWhiteSpace(persona.DNI))
+            if (string.IsNullOrWhiteSpace(persona.Dni))
                 throw new ValidacionExcepcion("El DNI no puede estar vacío.");
 
             if (string.IsNullOrWhiteSpace(persona.Email))
