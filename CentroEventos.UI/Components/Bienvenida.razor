@@ -2,61 +2,51 @@
 
 <PageTitle>Bienvenida - Centro de Eventos</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex flex-column justify-center align-center min-vh-100">
-    <MudPaper Elevation="3" Class="pa-8 welcome-paper">
-        <MudStack Row="false" Spacing="4" AlignItems="AlignItems.Center">
-            <MudIcon Icon="@Icons.Material.Filled.Event" 
-                     Color="Color.Primary" 
-                     Size="Size.Large" 
-                     Style="width: 64px; height: 64px;" />
-            
-            <MudText Typo="Typo.h3" 
-                     Align="Align.Center" 
-                     Color="Color.Primary" 
-                     Class="welcome-title">
-                ¡Bienvenido a Centro de Eventos!
-            </MudText>
-            
-            <MudText Typo="Typo.subtitle1" 
-                     Align="Align.Center" 
-                     Class="mb-6" 
-                     Style="max-width: 600px;">
-                Gestiona tus eventos deportivos de manera fácil y segura.
-            </MudText>
+<div class="background-container" Style="margin-top: 50px;">
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex flex-column justify-center align-center min-vh-100">
+        <MudPaper Elevation="4" Class="welcome-paper">
+            <MudStack Row="false" Spacing="6" AlignItems="AlignItems.Center" Class="pa-8">
+                <div class="icon-container">
+                    <MudIcon Icon="@Icons.Material.Filled.Event" 
+                            Color="Color.Primary" 
+                            Size="Size.Large" 
+                            Class="welcome-icon" />
+                </div>
+                
+                <div class="text-container">
+                    <MudText Typo="Typo.h3" 
+                            Align="Align.Center" 
+                            Color="Color.Primary" 
+                            Class="welcome-title">
+                        ¡Bienvenido a Centro de Eventos!
+                    </MudText>
+                    
+                    <MudText Typo="Typo.subtitle1" 
+                            Align="Align.Center" 
+                            Class="welcome-subtitle">
+                        Gestiona tus eventos deportivos de manera fácil y segura.
+                    </MudText>
+                </div>
 
-            <MudPaper Elevation="0" Class="pa-4" Style="border: none;">
-                <MudStack Row="true" Spacing="3" JustifyContent="JustifyContent.Center">
+                <MudDivider Class="my-4" />
+
+                <div class="buttons-container">
                     <MudButton Href="/Login"
-                             Variant="Variant.Filled" 
-                             Color="Color.Primary" 
-                             Size="Size.Large"
-                             Class="px-6">
+                              Variant="Variant.Filled" 
+                              Color="Color.Primary" 
+                              Size="Size.Large"
+                              Class="welcome-button">
                         Iniciar sesión
                     </MudButton>
                     <MudButton Href="/Registro"
-                             Variant="Variant.Outlined" 
-                             Color="Color.Secondary" 
-                             Size="Size.Large"
-                             Class="px-6">
+                              Variant="Variant.Outlined" 
+                              Color="Color.Secondary" 
+                              Size="Size.Large"
+                              Class="welcome-button">
                         Registrarse
                     </MudButton>
-                </MudStack>
-            </MudPaper>
-        </MudStack>
-    </MudPaper>
-</MudContainer>
-
-<style>
-    .welcome-paper {
-        backdrop-filter: blur(10px);
-        border-radius: 16px;
-        max-width: 800px;
-        margin: 2rem;
-        transition: all 0.3s ease;
-    }
-
-    .welcome-title {
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-</style>
+                </div>
+            </MudStack>
+        </MudPaper>
+    </MudContainer>
+</div>
