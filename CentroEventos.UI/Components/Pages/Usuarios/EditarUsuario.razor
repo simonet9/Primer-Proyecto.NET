@@ -1,13 +1,244 @@
-﻿@page "/usuarios/editar"
+﻿@page "/usuarios/modificar/{Id:guid}"
 @using CentroEventos.Aplicacion.Entities
-@using CentroEventos.Aplicacion.Interfaces
 @using CentroEventos.Aplicacion.UseCases.Users
-@using CentroEventos.UI.Components.Pages.Shared
+@using CentroEventos.Aplicacion.Service
+@using CentroEventos.Aplicacion.Exceptions
+@using CentroEventos.Aplicacion.Interfaces
+@using CentroEventos.Aplicacion.Enum
 @inject ModificarUsuarioUseCase ModificarUsuarioUseCase
-@inject IRepositorioUsuario RepoUsuario
+@inject IRepositorioUsuario RepositorioUsuario
 @inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject UsuarioLogueado UsuarioLogueado
 
-<MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">Editar Usuario</MudText>
-        <FormularioUsuario BotonSubmitTexto="Guardar" OnSubmit="Editar" />
-</MudPaper>
+<PageTitle>Editar Usuario</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+    <MudPaper Elevation="2" Class="pa-6">
+        <MudText Typo="Typo.h5" Class="mb-4">Editar Usuario</MudText>
+
+        @if (!_usuarioEstaLogueado)
+        {
+            <MudAlert Severity="Severity.Error">Debe iniciar sesión para acceder a esta página</MudAlert>
+        }
+        else
+        {
+            <EditForm Model="@_usuario" OnValidSubmit="GuardarCambios">
+                <DataAnnotationsValidator/>
+
+                <MudGrid Gutter="Size.Medium">
+
+                    <!-- Columna izquierda: formulario -->
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="_usuario.Nombre"
+                                      Label="Nombre"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      Required="true"
+                                      Class="mb-3"/>
+
+                        <MudTextField @bind-Value="_usuario.Apellido"
+                                      Label="Apellido"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      Required="true"
+                                      Class="mb-3"/>
+
+                        <MudTextField @bind-Value="_usuario.Email"
+                                      Label="Correo Electrónico"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      Required="true"
+                                      Class="mb-3"/>
+                        <MudTextField @bind-Value="_nuevaClave"
+                                      Label="Nueva Contraseña"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      InputType="@(_mostrarClave ? InputType.Text : InputType.Password)"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@(_mostrarClave ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                      OnAdornmentClick="() => _mostrarClave = !_mostrarClave"
+                                      Class="mb-3"/>
+                    </MudItem>
+
+                    <!-- Columna derecha: permisos -->
+                    <MudItem xs="12" md="6">
+                        <MudText Typo="Typo.h6" Class="mb-3">Permisos</MudText>
+
+                        <MudPaper Class="pa-4" Outlined="true">
+                            <!-- Permisos de Eventos -->
+                            <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="mb-2">Eventos</MudText>
+                            <div class="d-flex flex-column mb-3">
+                                <MudCheckBox Color="Color.Success" @bind-Value="_permisosEventoAlta" Label="Alta" Class="mb-1"/>
+                                <MudCheckBox Color="Color.Info" @bind-Value="_permisosEventoModif" Label="Modificación" Class="mb-1"/>
+                                <MudCheckBox Color="Color.Error" @bind-Value="_permisosEventoBaja" Label="Baja" Class="mb-1"/>
+                            </div>
+
+                            <!-- Permisos de Reservas -->
+                            <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="mb-2">Reservas</MudText>
+                            <div class="d-flex flex-column mb-3">
+                                <MudCheckBox Color="Color.Success" @bind-Value="_permisosReservaAlta" Label="Alta" Class="mb-1"/>
+                                <MudCheckBox Color="Color.Info" @bind-Value="_permisosReservaModif" Label="Modificación" Class="mb-1"/>
+                                <MudCheckBox Color="Color.Error" @bind-Value="_permisosReservaBaja" Label="Baja" Class="mb-1"/>
+                            </div>
+
+                            <!-- Permisos de Usuarios -->
+                            <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="mb-2">Usuarios</MudText>
+                            <div class="d-flex flex-column">
+                                <MudCheckBox Color="Color.Success" @bind-Value="_permisosUsuarioAlta" Label="Alta" Class="mb-1"/>
+                                <MudCheckBox Color="Color.Info" @bind-Value="_permisosUsuarioModif" Label="Modificación" Class="mb-1"/>
+                                <MudCheckBox Color="Color.Error" @bind-Value="_permisosUsuarioBaja" Label="Baja" Class="mb-1"/>
+                            </div>
+                        </MudPaper>
+                    </MudItem>
+
+                </MudGrid>
+
+                <div class="d-flex justify-space-between mt-4">
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Secondary"
+                               OnClick="Cancelar">
+                        Cancelar
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               ButtonType="ButtonType.Submit">
+                        Guardar
+                    </MudButton>
+                </div>
+            </EditForm>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private Usuario _usuario = new Usuario
+    {
+        Permisos = new List<Permiso>()
+    };
+    private string _nuevaClave = string.Empty;
+    private bool _mostrarClave;
+    private bool _usuarioEstaLogueado;
+
+    // Variables para controlar los permisos
+    private bool _permisosEventoAlta;
+    private bool _permisosEventoModif;
+    private bool _permisosEventoBaja;
+    private bool _permisosReservaAlta;
+    private bool _permisosReservaModif;
+    private bool _permisosReservaBaja;
+    private bool _permisosUsuarioAlta;
+    private bool _permisosUsuarioModif;
+    private bool _permisosUsuarioBaja;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Verificar si hay un usuario logueado
+        _usuarioEstaLogueado = UsuarioLogueado.ExisteUsuarioLogueado();
+
+        if (!_usuarioEstaLogueado)
+        {
+            return;
+        }
+
+        try
+        {
+            // Obtener el usuario a editar
+            _usuario = RepositorioUsuario.ObtenerPorId(Id) ?? throw new EntidadNotFoundException("Usuario no encontrado");
+
+            // Cargar los permisos actuales
+            CargarPermisos();
+
+            // Forzar actualización de la UI
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+            NavigationManager.NavigateTo("/usuarios");
+        }
+    }
+
+    private void CargarPermisos()
+    {
+        // Log del número de permisos para depuración
+        Console.WriteLine($"Cargando {_usuario.Permisos.Count} permisos para el usuario {_usuario.Nombre}");
+
+        // Establecer los estados de los checkboxes según los permisos del usuario
+        _permisosEventoAlta = _usuario.Permisos.Contains(Permiso.EventoAlta);
+        _permisosEventoModif = _usuario.Permisos.Contains(Permiso.EventoModificacion);
+        _permisosEventoBaja = _usuario.Permisos.Contains(Permiso.EventoBaja);
+        _permisosReservaAlta = _usuario.Permisos.Contains(Permiso.ReservaAlta);
+        _permisosReservaModif = _usuario.Permisos.Contains(Permiso.ReservaModificacion);
+        _permisosReservaBaja = _usuario.Permisos.Contains(Permiso.ReservaBaja);
+        _permisosUsuarioAlta = _usuario.Permisos.Contains(Permiso.UsuarioAlta);
+        _permisosUsuarioModif = _usuario.Permisos.Contains(Permiso.UsuarioModificacion);
+        _permisosUsuarioBaja = _usuario.Permisos.Contains(Permiso.UsuarioBaja);
+
+        // Log de los permisos cargados para depuración
+        Console.WriteLine($"Eventos: Alta={_permisosEventoAlta}, Mod={_permisosEventoModif}, Baja={_permisosEventoBaja}");
+        Console.WriteLine($"Reservas: Alta={_permisosReservaAlta}, Mod={_permisosReservaModif}, Baja={_permisosReservaBaja}");
+        Console.WriteLine($"Usuarios: Alta={_permisosUsuarioAlta}, Mod={_permisosUsuarioModif}, Baja={_permisosUsuarioBaja}");
+    }
+
+    private void GuardarCambios()
+    {
+        try
+        {
+            // Actualizar contraseña si se ingresó una nueva
+            if (!string.IsNullOrWhiteSpace(_nuevaClave))
+            {
+                _usuario.HashPassword = _nuevaClave;
+            }
+
+            // Actualizar los permisos del usuario
+            ActualizarPermisos();
+
+            // Mostrar los permisos que se van a guardar (depuración)
+            string permisosStr = string.Join(", ", _usuario.Permisos.Select(p => p.ToString()));
+            Console.WriteLine($"Guardando usuario con permisos: {permisosStr}");
+            Snackbar.Add($"Permisos actualizados: {permisosStr}", Severity.Info);
+
+            // Obtener el ID del usuario logueado y ejecutar el caso de uso
+            if (UsuarioLogueado.UsuarioActual == null) return;
+            var usuarioActualId = UsuarioLogueado.UsuarioActual.Id;
+            ModificarUsuarioUseCase.Ejecutar(_usuario, usuarioActualId);
+            Snackbar.Add("Usuario actualizado correctamente", Severity.Success);
+            NavigationManager.NavigateTo("/usuarios/listar");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void ActualizarPermisos()
+    {
+        // Limpiar los permisos actuales
+        _usuario.Permisos.Clear();
+
+        //dep
+        Console.WriteLine($"Estado de checkboxes antes de actualizar permisos:");
+        Console.WriteLine($"Eventos: Alta={_permisosEventoAlta}, Mod={_permisosEventoModif}, Baja={_permisosEventoBaja}");
+
+        // Añadir los permisos según los checkboxes seleccionados
+        if (_permisosEventoAlta) _usuario.Permisos.Add(Permiso.EventoAlta);
+        if (_permisosEventoModif) _usuario.Permisos.Add(Permiso.EventoModificacion);
+        if (_permisosEventoBaja) _usuario.Permisos.Add(Permiso.EventoBaja);
+        if (_permisosReservaAlta) _usuario.Permisos.Add(Permiso.ReservaAlta);
+        if (_permisosReservaModif) _usuario.Permisos.Add(Permiso.ReservaModificacion);
+        if (_permisosReservaBaja) _usuario.Permisos.Add(Permiso.ReservaBaja);
+        if (_permisosUsuarioAlta) _usuario.Permisos.Add(Permiso.UsuarioAlta);
+        if (_permisosUsuarioModif) _usuario.Permisos.Add(Permiso.UsuarioModificacion);
+        if (_permisosUsuarioBaja) _usuario.Permisos.Add(Permiso.UsuarioBaja);
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/usuarios/listar");
+    }
+
+}
