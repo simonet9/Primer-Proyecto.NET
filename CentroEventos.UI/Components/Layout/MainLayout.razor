@@ -1,8 +1,8 @@
-﻿@using CentroEventos.Aplicacion.Interfaces
+﻿@using CentroEventos.Aplicacion.Service
 @using CentroEventos.UI.Components.Pages.Shared
 @inherits LayoutComponentBase
-@inject IServicioAutorizacion ServicioAutorizacion
 @inject NavigationManager NavigationManager
+@inject UsuarioLogueado User
 
 <MudThemeProvider />
 <MudPopoverProvider />
@@ -14,10 +14,13 @@
         <MudAppBar Elevation="1">
             @if (!EsPaginaSinMenu)
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-            }
+               <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle" />
             <MudSpacer />
-            <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End">
+                <MudMenuItem OnClick="@OnPerfilClick">Perfil</MudMenuItem>
+                <MudMenuItem OnClick="@OnCerrarSesionClick">Cerrar Sesion</MudMenuItem>
+            </MudMenu>
+            }
         </MudAppBar>
         <MudDrawer @bind-Open="_drawerOpen" Elevation="2" Variant="@(EsPaginaSinMenu ? DrawerVariant.Temporary : DrawerVariant.Responsive)">
             <MudDrawerHeader>
@@ -56,5 +59,17 @@
             _drawerOpen = false;
         }
         base.OnInitialized();
+    }
+    void OnPerfilClick()
+    {
+        // Lógica para ir al perfil
+        NavigationManager.NavigateTo("/Perfil");
+    }
+
+    void OnCerrarSesionClick()
+    {
+        // Lógica para cerrar sesión
+        User.Limpiar();
+        NavigationManager.NavigateTo("/", true);
     }
 }

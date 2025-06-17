@@ -63,7 +63,7 @@
         UsuarioLogueado.SetUsuario(usuario);
         Snackbar.Add("Inicio de sesión exitoso", Severity.Success);
         await Task.Delay(1500);
-        Navigation.NavigateTo("/Index", true);
+        Navigation.NavigateTo("/Index");
     }
 
     private void MostrarError(string mensaje) => Snackbar.Add(mensaje, Severity.Error);

@@ -9,7 +9,7 @@ namespace CentroEventos.Aplicacion.UseCases.Users;
 
 public class RegistrarUsuarioUseCase(IRepositorioUsuario repoUsuario)
 {
-    public void Ejecutar(string nombre, string apellido, string email, string password)
+    public void Ejecutar(string nombre, string apellido, string email, string password, List<Permiso> datosPermisos)
     {
         try
         {
@@ -20,7 +20,7 @@ public class RegistrarUsuarioUseCase(IRepositorioUsuario repoUsuario)
                 throw new DuplicadoException("Ya existe un usuario con ese email");
             }
             var hashPassword = HashHelper.CalcularHash(password);
-            var usuario = new Usuario(nombre, apellido, email, hashPassword);
+            var usuario = new Usuario(nombre, apellido, email, hashPassword,datosPermisos);
 
 
             if (!repoUsuario.ExisteAlguno())

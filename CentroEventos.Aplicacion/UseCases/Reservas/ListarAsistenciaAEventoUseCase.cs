@@ -41,10 +41,9 @@ namespace CentroEventos.Aplicacion.UseCases.Reservas
         private List<Persona> ObtenerAsistentesDeReservas(IEnumerable<Reserva> reservas)
         {
             var reservaPresente = reservas.Where(r => r.EstadoAsistencia == Estado.Presente);
-            return reservaPresente
-                .Select(r => repoPersona.BuscarPorId(r.PersonaId))
-                .Where(p => p != null)
-                .ToList()!;
+            var list = reservaPresente.Select(r => repoPersona.BuscarPorId(r.PersonaId)).OfType<Persona>().ToList();
+
+            return list;
         }
     }
 }

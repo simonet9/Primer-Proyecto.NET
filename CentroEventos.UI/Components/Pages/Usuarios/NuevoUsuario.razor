@@ -1,12 +1,72 @@
-﻿@page "/usuarios/nuevo"
+﻿@page "/usuarios/agregar"
+@using CentroEventos.Aplicacion.Enum
+@using CentroEventos.Aplicacion.Service
 @using CentroEventos.Aplicacion.UseCases.Users
-@using CentroEventos.UI.Components.Pages.Shared
-@inject RegistrarUsuarioUseCase AgregarUsuarioUseCase
+@inject RegistrarUsuarioUseCase RegistrarUsuarioUseCase
+@inject UsuarioLogueado User
 @inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
 
-<MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">Nuevo Usuario</MudText>
-    <FormularioUsuario BotonSubmitTexto="Crear" OnSubmit="CrearUsuario" />
-</MudPaper>
+<div class="container-fluid py-4">
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudPaper Elevation="3" Class="pa-6 rounded-lg">
+            <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold d-flex justify-center align-items-center text-center">
+                <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Class="mr-3 mt-3"/>
+                Nuevo Usuario
+            </MudText>
+            <FormularioNuevoUsuario OnGuardar="CrearUsuario" OnError="ManejarError"/>
+            <div class="d-flex justify-start mt-4">
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.ArrowBack"
+                           Size="Size.Medium"
+                           Class="rounded-lg px-4"
+                           OnClick="Volver">
+                    Volver
+                </MudButton>
+            </div>
+        </MudPaper>
+    </MudContainer>
+</div>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        if (User.ExisteUsuarioLogueado()) return;
+        NavigationManager.NavigateTo("/");
+    }
+
+    private async Task CrearUsuario((string Nombre, string Apellido, string Email, string Password, List<Permiso> Permisos) datos)
+    {
+        try
+        {
+            await Task.Run(() => RegistrarUsuarioUseCase.Ejecutar(
+                datos.Nombre,
+                datos.Apellido,
+                datos.Email,
+                datos.Password,
+                datos.Permisos));
+
+            Snackbar.Add("Usuario creado con éxito", Severity.Success);
+            Volver();
+        }
+        catch (Exception ex)
+        {
+            ManejarError(ex.Message);
+        }
+    }
+
+    private void ManejarError(string mensaje)
+    {
+        Snackbar.Add(mensaje, Severity.Error);
+    }
+
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/usuarios/listar");
+    }
+
+}
 
  

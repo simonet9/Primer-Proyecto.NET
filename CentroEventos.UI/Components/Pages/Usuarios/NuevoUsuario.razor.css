@@ -1,0 +1,39 @@
+﻿.admin-container {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.admin-card {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.admin-form-side {
+    background-color: white;
+}
+
+.admin-info-side {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    min-height: 100%;
+    text-align: center;
+}
+
+/* Iconos en el panel lateral */
+.admin-info-side .mud-icon-root {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 959px) {
+    .admin-info-side {
+        border-radius: 0 0 16px 16px;
+        padding: 2rem 1rem;
+    }
+
+    .admin-card {
+        margin-bottom: 1rem;
+    }
+}

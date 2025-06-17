@@ -1,4 +1,10 @@
-﻿<MudNavMenu>
+﻿@using CentroEventos.Aplicacion.Enum
+@using CentroEventos.Aplicacion.Interfaces
+@using CentroEventos.Aplicacion.Service
+
+@inject UsuarioLogueado User
+@inject IServicioAutorizacion ServicioAutorizacion
+<MudNavMenu>
 <MudNavLink Href="/Index" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
 
 <MudNavGroup Title="Personas" Icon="@Icons.Material.Filled.Person" Expanded="true">
@@ -8,14 +14,17 @@
     <MudNavLink Href="/personas/agregar" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Agregar
         Persona
     </MudNavLink>
-</MudNavGroup>
-<MudNavGroup Title="Usuarios" Icon="@Icons.Material.Filled.AssignmentInd" Expanded="true">
+    </MudNavGroup>
+    <MudNavGroup Title="Usuarios" Icon="@Icons.Material.Filled.AssignmentInd" Expanded="true">
     <MudNavLink Href="/usuarios/listar" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Listar
         Usuarios
     </MudNavLink>
-    <MudNavLink Href="/usuarios/agregar" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Agregar
-        Usuario
-    </MudNavLink>
+    @if (TienePermiso(Permiso.UsuarioAlta))
+    {
+        <MudNavLink Href="/usuarios/agregar" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Agregar
+            Usuario
+        </MudNavLink>
+    }
 </MudNavGroup>
 <MudNavGroup Title="Eventos" Icon="@Icons.Material.Filled.Event" Expanded="true">
     <MudNavLink Href="/eventos/listar" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Listar
@@ -24,9 +33,12 @@
     <MudNavLink Href="/eventos/disponibles" Match="NavLinkMatch.Prefix"
                 Icon="@Icons.Material.Filled.EventAvailable">Eventos con Cupo
     </MudNavLink>
-    <MudNavLink Href="/eventos/agregar" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Agregar
-        Evento
-    </MudNavLink>
+    @if (TienePermiso(Permiso.EventoAlta))
+    {
+        <MudNavLink Href="/eventos/agregar" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Agregar
+            Evento
+        </MudNavLink>
+    }
     <MudNavLink Href="/eventos/asistencia" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">
         Asistencia
     </MudNavLink>
@@ -36,8 +48,18 @@
     <MudNavLink Href="/reservas/listar" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Listar
         Reservas
     </MudNavLink>
-    <MudNavLink Href="/reservas/agregar" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Nueva
-        Reserva
-    </MudNavLink>
+    @if (TienePermiso(Permiso.ReservaAlta))
+    {
+        <MudNavLink Href="/reservas/agregar" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Nueva
+            Reserva
+        </MudNavLink>
+    }
 </MudNavGroup>
 </MudNavMenu>
+
+@code {
+    private Guid IdUsuario => User.UsuarioActual?.Id ?? Guid.Empty;
+
+    private bool TienePermiso(Permiso permiso) => ServicioAutorizacion.PoseeElPermiso(IdUsuario, permiso);
+    
+}

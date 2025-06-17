@@ -1,0 +1,27 @@
+﻿
+    .container-fluid {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .mud-table {
+        background-color: transparent !important;
+    }
+
+    .mud-table-cell {
+        font-size: 0.875rem !important;
+    }
+    
+    .mud-button {
+        text-transform: none !important;
+        transition: transform 0.2s !important;
+    }
+    
+    .mud-button:hover {
+        transform: translateY(-1px);
+    }
+    
+.mud-table-hover tr:hover {
+    background-color: rgba(0,0,0,0.04) !important;
+}

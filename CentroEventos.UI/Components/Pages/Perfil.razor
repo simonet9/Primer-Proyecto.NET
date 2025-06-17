@@ -1,18 +1,119 @@
 ﻿@page "/Perfil"
 @using CentroEventos.Aplicacion.Entities
-@using CentroEventos.Aplicacion.UseCases.Users
-@using CentroEventos.UI.Components.Pages.Shared
-@inject ModificarUsuarioUseCase ModificarUsuarioUseCase
+@using CentroEventos.Aplicacion.Service
+@inject UsuarioLogueado UsuarioService
 @inject NavigationManager NavigationManager
 
-<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 100vh;">
-    <MudPaper Elevation="25" Class="pa-8" Style="width: 500px; backdrop-filter: blur(10px); background-color: rgba(255,255,255,0.8);">
-        <MudStack Class="align-center" Spacing="4">
-            <MudText Typo="Typo.h4" Class="mb-4">Mi Perfil</MudText>
-            <FormularioUsuario 
-                BotonSubmitTexto="Guardar Cambios"
-                BotonSubmitIcono="@Icons.Material.Filled.Save"
-                ProcesoTexto="Guardando..."/>
-        </MudStack>
-    </MudPaper>
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-8">
+    <MudCard Elevation="3" Class="perfil-card">
+        <MudCardHeader Class="perfil-header">
+            <CardHeaderAvatar>
+                <MudAvatar Color="Color.Primary" Size="Size.Large" Class="perfil-avatar">
+                    @(UsuarioActual?.Nombre.FirstOrDefault().ToString().ToUpper() ?? "U")
+                </MudAvatar>
+            </CardHeaderAvatar>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5">@($"{UsuarioActual?.Nombre} {UsuarioActual?.Apellido}")</MudText>
+                <MudText Typo="Typo.body2">@UsuarioActual?.Email</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudDivider/>
+
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudPaper Class="pa-4 perfil-seccion" Elevation="0">
+                        <MudText Typo="Typo.h6" Class="mb-2 seccion-titulo">
+                            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-2"/>
+                            Información Personal
+                        </MudText>
+                        <MudList Clickable="false" T="string">
+                            <MudListItem>
+                                <MudText><b>Nombre:</b> @UsuarioActual?.Nombre</MudText>
+                            </MudListItem>
+                            <MudListItem>
+                                <MudText><b>Apellido:</b> @UsuarioActual?.Apellido</MudText>
+                            </MudListItem>
+                            <MudListItem>
+                                <MudText><b>Email:</b> @UsuarioActual?.Email</MudText>
+                            </MudListItem>
+                        </MudList>
+                    </MudPaper>
+                </MudItem>
+
+                @if (UsuarioActual?.Permisos.Any() == true)
+                {
+                    <MudItem xs="12" md="6">
+                        <MudPaper Class="pa-4 perfil-seccion" Elevation="0">
+                            <MudText Typo="Typo.h6" Class="mb-2 seccion-titulo">
+                                <MudIcon Icon="@Icons.Material.Filled.Security" Class="mr-2"/>
+                                Permisos
+                            </MudText>
+                            @{
+                                var grupos = new[] { "Evento", "Reserva", "Usuario" };
+                            }
+                            <MudGrid>
+                                @foreach (var grupo in grupos)
+                                {
+                                    var permisosGrupo = UsuarioActual.Permisos
+                                        .Where(p => p.ToString().StartsWith(grupo))
+                                        .ToList();
+                                    if (permisosGrupo.Any())
+                                    {
+                                        <MudItem xs="12" md="4">
+                                            <MudText Typo="Typo.subtitle2" Class="mb-2"
+                                                     Color="Color.Primary">@grupo</MudText>
+                                            @foreach (var permiso in permisosGrupo)
+                                            {
+                                                <MudPaper Class="permiso-item mb-2 d-flex align-center" Elevation="0">
+                                                    <MudIcon Icon="@ObtenerIcono(permiso.ToString())" Class="mr-2"/>
+                                                    @FormatearPermiso(permiso.ToString())
+                                                </MudPaper>
+                                            }
+                                        </MudItem>
+                                    }
+                                }
+                            </MudGrid>
+                        </MudPaper>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudCardContent>
+    </MudCard>
+    <MudCardActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                   OnClick="@(() => NavigationManager.NavigateTo("/index"))">
+            Ir a Inicio
+        </MudButton>
+    </MudCardActions>
 </MudContainer>
+
+@code {
+    private Usuario? UsuarioActual => UsuarioService.UsuarioActual;
+
+    protected override void OnInitialized()
+    {
+        if (!UsuarioService.ExisteUsuarioLogueado())
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private static string FormatearPermiso(string permiso)
+    {
+        var sinPrefijo = permiso.Replace("Evento", "").Replace("Reserva", "").Replace("Usuario", "");
+        return System.Text.RegularExpressions.Regex.Replace(sinPrefijo, "([A-Z])", " $1").Trim();
+    }
+
+    private static string ObtenerIcono(string permiso)
+    {
+        if (permiso.Contains("Alta", StringComparison.OrdinalIgnoreCase))
+            return Icons.Material.Filled.Add;
+        if (permiso.Contains("Modificacion", StringComparison.OrdinalIgnoreCase))
+            return Icons.Material.Filled.Edit;
+        if (permiso.Contains("Baja", StringComparison.OrdinalIgnoreCase))
+            return Icons.Material.Filled.Delete;
+        return Icons.Material.Filled.Check;
+    }
+
+}

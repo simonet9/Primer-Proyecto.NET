@@ -1,4 +1,5 @@
 ﻿@page "/Registro"
+@using CentroEventos.Aplicacion.Enum
 @using CentroEventos.UI.Components.Pages.Shared
 @inject NavigationManager Navigation
 @inject Aplicacion.UseCases.Users.RegistrarUsuarioUseCase RegistrarUsuarioUseCase
@@ -45,7 +46,7 @@
     {
         try
         {
-            RegistrarUsuarioUseCase.Ejecutar(datos.Nombre, datos.Apellido, datos.Email, datos.Password);
+            RegistrarUsuarioUseCase.Ejecutar(datos.Nombre, datos.Apellido, datos.Email, datos.Password,new List<Permiso>());
             Snackbar.Add("Registro exitoso", Severity.Success);
             await Task.Delay(1500);
             Navigation.NavigateTo("/Login", true);

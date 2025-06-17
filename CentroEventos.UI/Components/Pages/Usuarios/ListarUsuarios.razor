@@ -1,31 +1,139 @@
 ﻿@page "/usuarios/listar"
 @using CentroEventos.Aplicacion.Entities
+@using CentroEventos.Aplicacion.Enum
+@using CentroEventos.Aplicacion.Interfaces
+@using CentroEventos.Aplicacion.Service
 @using CentroEventos.Aplicacion.UseCases.Users
 @inject ListarUsuariosUseCase ListarUsuariosUseCase
+@inject UsuarioLogueado User
+@inject IServicioAutorizacion Service
+@inject NavigationManager Navigation
+@inject EliminarUsuarioUseCase Eliminar
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
-<MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">Usuarios</MudText>
-    <MudTable Items="_usuarios">
-        <HeaderContent>
-            <MudTh>Nombre</MudTh>
-            <MudTh>Apellido</MudTh>
-            <MudTh>Email</MudTh>
-            <MudTh>Permisos</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd>@context.Nombre</MudTd>
-            <MudTd>@context.Apellido</MudTd>
-            <MudTd>@context.Email</MudTd>
-            <MudTd>@string.Join(", ", context.Permisos)</MudTd>
-        </RowTemplate>
-    </MudTable>
-</MudPaper>
+<div class="container-fluid">
+    <MudPaper Elevation="3" Class="pa-6 rounded-lg">
+        <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold">
+            <MudIcon Icon="@Icons.Material.Filled.People" Class="mr-3" />
+            Usuarios
+        </MudText>
+    
+        @if (TienePermisoAgregar)
+        {
+            <div class="d-flex justify-end mb-4">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Success"
+                           StartIcon="@Icons.Material.Filled.PersonAdd"
+                           Size="Size.Medium"
+                           Class="rounded-lg px-4"
+                           OnClick="AgregarUsuario">
+                    Agregar Usuario
+                </MudButton>
+            </div>
+        }
+
+        <MudTable Items="_usuarios" 
+                  Hover="true" 
+                  Striped="true" 
+                  Elevation="0"
+                  Class="mt-4">
+            <HeaderContent>
+                <MudTh>
+                    <MudText Typo="Typo.subtitle2">Nombre</MudText>
+                </MudTh>
+                <MudTh>
+                    <MudText Typo="Typo.subtitle2">Apellido</MudText>
+                </MudTh>
+                <MudTh>
+                    <MudText Typo="Typo.subtitle2">Email</MudText>
+                </MudTh>
+                @if (TienePermisoModificar || TienePermisoEliminar)
+                {
+                    <MudTh>
+                        <MudText Typo="Typo.subtitle2">Acciones</MudText>
+                    </MudTh>
+                }
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
+                <MudTd DataLabel="Apellido">@context.Apellido</MudTd>
+                <MudTd DataLabel="Email">@context.Email</MudTd>
+                @if (TienePermisoModificar || TienePermisoEliminar)
+                {
+                    <MudTd>
+                        @if (TienePermisoModificar)
+                        {
+                            <MudButton Color="Color.Primary"
+                                    Variant="Variant.Filled"
+                                    Size="Size.Small"
+                                    StartIcon="@Icons.Material.Filled.Edit"
+                                    Class="rounded-lg px-3"
+                                    OnClick="@(() => ModificarUsuario(context))">
+                                Modificar
+                            </MudButton>
+                        }
+                        @if (TienePermisoEliminar && context.Id != IdUsuario)
+                        {
+                            <MudButton Color="Color.Error"
+                                    Variant="Variant.Filled"
+                                    Size="Size.Small"
+                                    StartIcon="@Icons.Material.Filled.Delete"
+                                    Class="@(TienePermisoModificar ? "ml-2 rounded-lg px-3" : "rounded-lg px-3")"
+                                    OnClick="@(() => ConfirmarEliminar(context))">
+                                Eliminar
+                            </MudButton>
+                        }
+                    </MudTd>
+                }
+            </RowTemplate>
+            <LoadingContent>
+                <MudText Class="pa-4" Align="Align.Center">Cargando usuarios...</MudText>
+            </LoadingContent>
+        </MudTable>
+    </MudPaper>
+</div>
 
 @code {
     private List<Usuario> _usuarios = new();
-
+    private Guid IdUsuario => User.UsuarioActual?.Id ?? Guid.Empty;
+    private bool TienePermisoModificar => Service.PoseeElPermiso(IdUsuario, Permiso.UsuarioModificacion);
+    private bool TienePermisoAgregar => Service.PoseeElPermiso(IdUsuario, Permiso.UsuarioAlta);
+    private bool TienePermisoEliminar => Service.PoseeElPermiso(IdUsuario, Permiso.UsuarioBaja);
     protected override void OnInitialized()
     {
+        if (!User.ExisteUsuarioLogueado())
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+        
         _usuarios = ListarUsuariosUseCase.Ejecutar();
+    }
+
+    private void ModificarUsuario(Usuario usuario)
+    {
+        Navigation.NavigateTo($"/usuarios/modificar/{usuario.Id}");
+    }
+
+    private async Task ConfirmarEliminar(Usuario usuario)
+    {
+        var resultado = await DialogService.ShowMessageBox(
+            "Confirmar",
+            "¿Desea eliminar este usuario?",
+            yesText: "Eliminar", 
+            cancelText: "Cancelar");
+
+        if (resultado == true)
+        {
+            Eliminar.Ejecutar(usuario.Id, IdUsuario);
+            _usuarios = ListarUsuariosUseCase.Ejecutar();
+            Snackbar.Add("Usuario eliminado con éxito", Severity.Success);
+        }
+    }
+
+    private void AgregarUsuario()
+    {
+        Navigation.NavigateTo("/usuarios/agregar");
     }
 }

@@ -15,4 +15,5 @@ public class UsuarioLogueado
     {
         UsuarioActual = null;
     }
+    public bool ExisteUsuarioLogueado() => UsuarioActual != null;
 }

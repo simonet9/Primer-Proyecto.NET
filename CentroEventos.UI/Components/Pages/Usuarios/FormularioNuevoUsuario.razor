@@ -1,0 +1,172 @@
+﻿@using CentroEventos.Aplicacion.Enum
+@using System.ComponentModel.DataAnnotations
+
+<MudForm @ref="_form" Model="_modelo">
+    <MudGrid Spacing="3">
+        <MudItem xs="12" md="6">
+            <MudGrid Spacing="3">
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" @bind-Value="_modelo.Nombre" Label="Nombre" Required="true"
+                                  RequiredError="El nombre es requerido" Variant="Variant.Outlined"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person"
+                                  AdornmentColor="Color.Primary"/>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" @bind-Value="_modelo.Apellido" Label="Apellido" Required="true"
+                                  RequiredError="El apellido es requerido" Variant="Variant.Outlined"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person"
+                                  AdornmentColor="Color.Primary"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string" @bind-Value="_modelo.Email" Label="Correo Electrónico" Required="true"
+                                  RequiredError="El correo es requerido" Variant="Variant.Outlined"
+                                  InputType="InputType.Email" Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Email"
+                                  AdornmentColor="Color.Primary"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string" @bind-Value="_modelo.Password" Label="Contraseña" Required="true"
+                                  RequiredError="La contraseña es requerida" Variant="Variant.Outlined"
+                                  InputType="@(_verPassword ? InputType.Text : InputType.Password)"
+                                  Adornment="Adornment.End"
+                                  AdornmentIcon="@(_verPassword ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"
+                                  OnAdornmentClick="() => _verPassword = !_verPassword"
+                                  AdornmentColor="Color.Primary"/>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudExpansionPanel IsInitiallyExpanded="true">
+                <TitleContent>
+                    <div class="d-flex align-center">
+                        <MudIcon Icon="@Icons.Material.Filled.Security" Class="mr-2"/>
+                        <MudText Typo="Typo.h6">Permisos del Usuario</MudText>
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    <MudGrid Class="mt-1">
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.subtitle1" Class="mb-2">Eventos</MudText>
+                            <div class="d-flex flex-wrap gap-3">
+                                <MudCheckBox T="bool" @bind-Checked="_permisosEventos[0]" Label="Alta"
+                                             Color="Color.Primary"/>
+                                <MudCheckBox T="bool" @bind-Checked="_permisosEventos[1]" Label="Modificación"
+                                             Color="Color.Primary"/>
+                                <MudCheckBox T="bool" @bind-Checked="_permisosEventos[2]" Label="Baja"
+                                             Color="Color.Primary"/>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.subtitle1" Class="mb-2">Reservas</MudText>
+                            <div class="d-flex flex-wrap gap-3">
+                                <MudCheckBox T="bool" @bind-Checked="_permisosReservas[0]" Label="Alta"
+                                             Color="Color.Primary"/>
+                                <MudCheckBox T="bool" @bind-Checked="_permisosReservas[1]" Label="Modificación"
+                                             Color="Color.Primary"/>
+                                <MudCheckBox T="bool" @bind-Checked="_permisosReservas[2]" Label="Baja"
+                                             Color="Color.Primary"/>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.subtitle1" Class="mb-2">Usuarios</MudText>
+                            <div class="d-flex flex-wrap gap-3">
+                                <MudCheckBox T="bool" @bind-Checked="_permisosUsuarios[0]" Label="Alta"
+                                             Color="Color.Primary"/>
+                                <MudCheckBox T="bool" @bind-Checked="_permisosUsuarios[1]" Label="Modificación"
+                                             Color="Color.Primary"/>
+                                <MudCheckBox T="bool" @bind-Checked="_permisosUsuarios[2]" Label="Baja"
+                                             Color="Color.Primary"/>
+                            </div>
+                        </MudItem>
+                    </MudGrid>
+                </ChildContent>
+            </MudExpansionPanel>
+        </MudItem>
+        <MudItem xs="12">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       Size="Size.Large"
+                       OnClick="ProcesarFormulario"
+                       Disabled="_procesando"
+                       Class="mt-4 py-2">
+                @if (_procesando)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2"/>
+                }
+                else
+                {
+                    @("Crear Usuario")
+                }
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</MudForm>
+@code {
+    [Parameter] public EventCallback<(string Nombre, string Apellido, string Email, string Password, List<Permiso> Permisos)> OnGuardar { get; set; }
+    [Parameter] public EventCallback<string> OnError { get; set; }
+
+    private MudForm? _form;
+    private bool _procesando, _verPassword;
+    private readonly FormularioModel _modelo = new();
+
+    private readonly bool[] _permisosEventos = new bool[3];
+    private readonly bool[] _permisosReservas = new bool[3];
+    private readonly bool[] _permisosUsuarios = new bool[3];
+
+    private async Task ProcesarFormulario()
+    {
+        if (_form != null)
+        {
+            await _form.Validate();
+            if (!_form.IsValid)
+                return;
+        }
+
+        try
+        {
+            _procesando = true;
+
+            var permisosSeleccionados = new List<Permiso>();
+
+            if (_permisosEventos[0]) permisosSeleccionados.Add(Permiso.EventoAlta);
+            if (_permisosEventos[1]) permisosSeleccionados.Add(Permiso.EventoModificacion);
+            if (_permisosEventos[2]) permisosSeleccionados.Add(Permiso.EventoBaja);
+
+            if (_permisosReservas[0]) permisosSeleccionados.Add(Permiso.ReservaAlta);
+            if (_permisosReservas[1]) permisosSeleccionados.Add(Permiso.ReservaModificacion);
+            if (_permisosReservas[2]) permisosSeleccionados.Add(Permiso.ReservaBaja);
+
+            if (_permisosUsuarios[0]) permisosSeleccionados.Add(Permiso.UsuarioAlta);
+            if (_permisosUsuarios[1]) permisosSeleccionados.Add(Permiso.UsuarioModificacion);
+            if (_permisosUsuarios[2]) permisosSeleccionados.Add(Permiso.UsuarioBaja);
+
+            await OnGuardar.InvokeAsync((_modelo.Nombre, _modelo.Apellido, _modelo.Email, _modelo.Password, permisosSeleccionados));
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+        finally
+        {
+            _procesando = false;
+        }
+    }
+
+    private class FormularioModel
+    {
+        [Required(ErrorMessage = "El nombre es requerido")]
+        public string Nombre { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El apellido es requerido")]
+        public string Apellido { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El correo es requerido")]
+        [EmailAddress(ErrorMessage = "El correo no es válido")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La contraseña es requerida")]
+        public string Password { get; set; } = string.Empty;
+    }
+
+}
