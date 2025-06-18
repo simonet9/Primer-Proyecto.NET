@@ -11,5 +11,6 @@ namespace CentroEventos.Aplicacion.Interfaces
         void Eliminar(Persona persona);
         void GuardarCambios();
         List<Persona> Listar();
+        Persona? ObtenerPorDocumento(string documento);
     }
 }

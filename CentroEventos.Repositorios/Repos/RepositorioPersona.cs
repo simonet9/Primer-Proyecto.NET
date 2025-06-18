@@ -8,6 +8,7 @@ public class RepositorioPersona(MyContext context) : IRepositorioPersona
 {
     public void Agregar(Persona persona)=>context.Personas.Add(persona);        
     public Persona? BuscarPorId(Guid id) => context.Personas.FirstOrDefault(p => p.Id == id);
+    public Persona? ObtenerPorDocumento(string documento) => context.Personas.FirstOrDefault(p => p.Dni == documento || p.Email == documento);
     public void Eliminar(Persona persona)=> context.Personas.Remove(persona);
     public void GuardarCambios() => context.SaveChanges();
     public bool ExisteDni(string dni, Guid idIgnorado) => context.Personas.Any(p => p.Dni == dni && p.Id != idIgnorado);

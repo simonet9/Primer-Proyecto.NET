@@ -6,7 +6,7 @@ using CentroEventos.Aplicacion.Validators;
 
 namespace CentroEventos.Aplicacion.UseCases.Evento
 {
-    public class AgregarEventoDeportivoUseCase(IRepositorioEventoDeportivo repo,IServicioAutorizacion aut)
+    public class AgregarEventoDeportivoUseCase(IRepositorioEventoDeportivo repo, IServicioAutorizacion aut)
     : UseCaseConAutorizacion(aut)
     {
         public void Ejecutar(EventoDeportivo eventoDeportivo, Guid usuarioId)
@@ -15,6 +15,7 @@ namespace CentroEventos.Aplicacion.UseCases.Evento
             ValidadorEventoDeportivo.Validar(eventoDeportivo);
             if(repo.BuscarPorId(eventoDeportivo.Id) != null)
                 throw new OperacionInvalidaException("Ya existe un evento deportivo con el mismo ID.");
+
             repo.Agregar(eventoDeportivo);
             repo.GuardarCambios();
         }

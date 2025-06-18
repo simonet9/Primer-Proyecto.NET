@@ -1,6 +1,5 @@
 using CentroEventos.Aplicacion.Entities;
 using CentroEventos.Aplicacion.Exceptions;
-using CentroEventos.Aplicacion.Interfaces;
 
 namespace CentroEventos.Aplicacion.Validators
 {
@@ -14,7 +13,7 @@ namespace CentroEventos.Aplicacion.Validators
             if (string.IsNullOrWhiteSpace(evento.Description))
                 throw new ValidacionExcepcion("La descripción no puede estar vacía.");
 
-            if (evento.FechaHoraInicio < DateTime.Now)
+            if (evento.FechaHoraInicio < DateTime.Now.Date)
                 throw new ValidacionExcepcion("La fecha y hora de inicio debe ser futura o igual al presente.");
 
             if (evento.CupoMaximo <= 0)
