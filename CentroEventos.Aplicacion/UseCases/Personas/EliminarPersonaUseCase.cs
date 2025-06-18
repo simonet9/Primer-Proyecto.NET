@@ -1,13 +1,11 @@
-using CentroEventos.Aplicacion.Entities;
-using CentroEventos.Aplicacion.Enum;
 using CentroEventos.Aplicacion.Exceptions;
 using CentroEventos.Aplicacion.Interfaces;
 
 namespace CentroEventos.Aplicacion.UseCases.Personas
 {
-    public class EliminarPersonaUseCase(IRepositorioPersona repo, IRepositorioEventoDeportivo repoEvento, IRepositorioReserva repoReserva, IServicioAutorizacion aut)
+    public class EliminarPersonaUseCase(IRepositorioPersona repo, IRepositorioEventoDeportivo repoEvento, IRepositorioReserva repoReserva)
     {
-        public void Ejecutar(Guid idPersona, Guid idUsuario)
+        public void Ejecutar(Guid idPersona)
         {
             ValidarAsociaciones(idPersona);
             var persona  = repo.BuscarPorId(idPersona) ?? throw new EntidadNotFoundException("Persona no encontrada.");

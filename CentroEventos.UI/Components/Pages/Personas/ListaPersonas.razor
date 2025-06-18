@@ -1,61 +1,137 @@
 ﻿@page "/personas/listar"
-        @using CentroEventos.Aplicacion.Entities
-        @inject CentroEventos.Aplicacion.UseCases.Personas.ListarPersonasUseCase ListarPersonasUseCase
-        
-        <div class="container-fluid">
-            <MudPaper Elevation="3" Class="pa-6 rounded-lg">
-                <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold">
-                    <MudIcon Icon="@Icons.Material.Filled.Groups" Class="mr-3" />
-                    Personas registradas
-                </MudText>
-        
-                @if (!string.IsNullOrEmpty(_error))
-                {
-                    <MudAlert Severity="Severity.Error">@_error</MudAlert>
-                }
-                else if (_personas.Count == 0)
-                {
-                    <MudAlert Severity="Severity.Info">No hay personas registradas.</MudAlert>
-                }
-                else
-                {
-                    <MudTable Items="_personas" Hover="true" Striped="true" Elevation="0" Class="mt-4">
-                        <HeaderContent>
-                            <MudTh><MudText Typo="Typo.subtitle2">DNI</MudText></MudTh>
-                            <MudTh><MudText Typo="Typo.subtitle2">Nombre</MudText></MudTh>
-                            <MudTh><MudText Typo="Typo.subtitle2">Apellido</MudText></MudTh>
-                            <MudTh><MudText Typo="Typo.subtitle2">Email</MudText></MudTh>
-                            <MudTh><MudText Typo="Typo.subtitle2">Teléfono</MudText></MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="DNI">@context.Dni</MudTd>
-                            <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
-                            <MudTd DataLabel="Apellido">@context.Apellido</MudTd>
-                            <MudTd DataLabel="Email">@context.Email</MudTd>
-                            <MudTd DataLabel="Teléfono">@context.Telefono</MudTd>
-                        </RowTemplate>
-                        <LoadingContent>
-                            <MudText Class="pa-4" Align="Align.Center">Cargando personas...</MudText>
-                        </LoadingContent>
-                    </MudTable>
-                }
-            </MudPaper>
+@using CentroEventos.Aplicacion.Entities
+@using CentroEventos.Aplicacion.Service
+@inject CentroEventos.Aplicacion.UseCases.Personas.ListarPersonasUseCase ListarPersonasUseCase
+@inject NavigationManager Navigation
+@inject CentroEventos.Aplicacion.UseCases.Personas.EliminarPersonaUseCase EliminarPersonaUseCase
+@inject UsuarioLogueado UsuarioLogueado
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<div class="container-fluid">
+    <MudPaper Elevation="3" Class="pa-6 rounded-lg">
+        <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold">
+            <MudIcon Icon="@Icons.Material.Filled.Groups" Class="mr-3" />
+            Personas registradas
+        </MudText>
+
+        <div class="d-flex justify-end mb-4">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Success"
+                       StartIcon="@Icons.Material.Filled.PersonAdd"
+                       Size="Size.Medium"
+                       Class="rounded-lg px-4"
+                       OnClick="AgregarPersona">
+                Agregar Persona
+            </MudButton>
         </div>
-        
-        @code {
-            private List<Persona> _personas = new();
-            private string? _error;
-        
-            protected override void OnInitialized()
+        @if (_personas.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info">No hay personas registradas.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="_personas" Hover="true" Striped="true" Elevation="0" Class="mt-4">
+                <HeaderContent>
+                    <MudTh><MudText Typo="Typo.subtitle2">DNI</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.subtitle2">Nombre</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.subtitle2">Apellido</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.subtitle2">Email</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.subtitle2">Teléfono</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.subtitle2">Acciones</MudText></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="DNI">@context.Dni</MudTd>
+                    <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
+                    <MudTd DataLabel="Apellido">@context.Apellido</MudTd>
+                    <MudTd DataLabel="Email">@context.Email</MudTd>
+                    <MudTd DataLabel="Teléfono">@context.Telefono</MudTd>
+                    <MudTd>
+                        <MudButton Color="Color.Primary"
+                                   Variant="Variant.Filled"
+                                   Size="Size.Small"
+                                   StartIcon="@Icons.Material.Filled.Edit"
+                                   Class="rounded-lg px-3"
+                                   OnClick="@(() => ModificarPersona(context))">
+                            Modificar
+                        </MudButton>
+                        <MudButton Color="Color.Error"
+                                   Variant="Variant.Filled"
+                                   Size="Size.Small"
+                                   StartIcon="@Icons.Material.Filled.Delete"
+                                   Class="ml-2 rounded-lg px-3"
+                                   OnClick="@(() => ConfirmarEliminar(context))">
+                            Eliminar
+                        </MudButton>
+                    </MudTd>
+                </RowTemplate>
+                <LoadingContent>
+                    <MudText Class="pa-4" Align="Align.Center">Cargando personas...</MudText>
+                </LoadingContent>
+            </MudTable>
+        }
+    </MudPaper>
+</div>
+
+@code {
+    private List<Persona> _personas = new();
+
+    protected override void OnInitialized()
+    {
+        var usuarioLogueado = UsuarioLogueado.UsuarioActual;
+        if (usuarioLogueado == null)
+        {
+            Navigation.NavigateTo("/login", true);
+            return;
+        }
+        CargarPersonas();
+    }
+
+    private void ModificarPersona(Persona persona)
+    {
+        Navigation.NavigateTo($"/personas/editar/{persona.Id}");
+    }
+
+    private async Task ConfirmarEliminar(Persona persona)
+    {
+        var resultado = await DialogService.ShowMessageBox(
+            "Confirmar",
+            "¿Desea eliminar esta persona?",
+            yesText: "Eliminar",
+            cancelText: "Cancelar");
+
+        if (resultado == true)
+        {
+            try
             {
-                try
-                {
-                    _personas = ListarPersonasUseCase.Ejecutar();
-                }
-                catch (Exception ex)
-                {
-                    _personas = new List<Persona>();
-                    _error = ex.Message;
-                }
+                // Si EliminarPersonaUseCase.Ejecutar es asíncrono, usa await
+                EliminarPersonaUseCase.Ejecutar(persona.Id);
+                Snackbar.Add("Persona eliminada con éxito", Severity.Success);
+                CargarPersonas();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error al eliminar: {ex.Message}", Severity.Error);
             }
         }
+    }
+
+    private void AgregarPersona()
+    {
+        Navigation.NavigateTo("/personas/agregar");
+    }
+
+    private void CargarPersonas()
+    {
+        try
+        {
+            _personas = ListarPersonasUseCase.Ejecutar();
+        }
+        catch (Exception ex)
+        {
+            _personas = new List<Persona>();
+            Snackbar.Add($"Error al cargar las personas: {ex.Message}", Severity.Error);
+        }
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,94 @@
+﻿@page "/personas/editar/{Id:guid}"
+@using CentroEventos.Aplicacion.Entities
+@using CentroEventos.Aplicacion.Service
+@inject CentroEventos.Aplicacion.UseCases.Personas.ModificarPersonaUseCase ModificarPersonaUseCase
+@inject Aplicacion.Interfaces.IRepositorioPersona RepositorioPersona
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+@inject UsuarioLogueado UsuarioLogueado
+
+<PageTitle>Editar Persona</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+    <MudPaper Elevation="2" Class="pa-6">
+        <MudText Typo="Typo.h5" Class="mb-4">Editar Persona</MudText>
+        @if (_persona is null)
+        {
+            <MudProgressCircular Indeterminate="true"/>
+        }
+        else
+        {
+            <EditForm Model="_persona" OnValidSubmit="GuardarCambios">
+                <DataAnnotationsValidator/>
+
+                <MudTextField @bind-Value="_persona.Dni" Label="DNI" Required="true" Variant="Variant.Outlined"
+                              FullWidth="true" Class="mb-3"/>
+                <MudTextField @bind-Value="_persona.Nombre" Label="Nombre" Required="true" Variant="Variant.Outlined"
+                              FullWidth="true" Class="mb-3"/>
+                <MudTextField @bind-Value="_persona.Apellido" Label="Apellido" Required="true"
+                              Variant="Variant.Outlined" FullWidth="true" Class="mb-3"/>
+                <MudTextField @bind-Value="_persona.Email" Label="Email" Required="true" Variant="Variant.Outlined"
+                              FullWidth="true" InputType="InputType.Email" Class="mb-3"/>
+                <MudTextField @bind-Value="_persona.Telefono" Label="Teléfono" Required="true"
+                              Variant="Variant.Outlined" FullWidth="true" Class="mb-3"/>
+
+                <div class="d-flex justify-space-between mt-4">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Cancelar">
+                        Cancelar
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">
+                        Guardar
+                    </MudButton>
+                </div>
+            </EditForm>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private Persona? _persona;
+    private bool _usuarioEstaLogueado;
+
+    protected override void OnInitialized()
+    {
+        _usuarioEstaLogueado = UsuarioLogueado.ExisteUsuarioLogueado();
+
+        if (!_usuarioEstaLogueado)
+            return;
+
+        try
+        {
+            _persona = RepositorioPersona.BuscarPorId(Id);
+            if (_persona is not null) return;
+            Snackbar.Add("Persona no encontrada", Severity.Error);
+            Navigation.NavigateTo("/personas/listar");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+            Navigation.NavigateTo("/personas/listar");
+        }
+    }
+
+    private void GuardarCambios()
+    {
+        try
+        {
+            ModificarPersonaUseCase.Ejecutar(_persona!);
+            Snackbar.Add("Persona modificada correctamente", Severity.Success);
+            Navigation.NavigateTo("/personas/listar");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+        
+    private void Cancelar()
+    {
+        Navigation.NavigateTo("/personas/listar");
+    }
+
+}
