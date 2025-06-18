@@ -19,16 +19,18 @@ var builder = WebApplication.CreateBuilder(args);
 // Database configuration
 // Configura la ruta de la base de datos
 
-//cambiar esto 
-var basePath = AppContext.BaseDirectory;
-var projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\..\"));
-var dataFolder = Path.Combine(projectPath, "Data");
-Directory.CreateDirectory(dataFolder);
-var dbPath = Path.Combine(dataFolder, "CentroEventos.sqlite");
 
+// Database configuration
+// Configura la ruta de la base de datos
+var dataDir = Path.Combine(AppContext.BaseDirectory, "Data");
+Directory.CreateDirectory(dataDir); // aseguro que exista
+var dbPath = Path.Combine(dataDir, "CentroEventos.sqlite");
 // Configura el contexto con la cadena de conexión
+
+
 builder.Services.AddDbContext<MyContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
+
 
 
 // Add services to the container.

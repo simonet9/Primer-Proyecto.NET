@@ -10,8 +10,8 @@
 
 <div class="container-fluid">
     <MudPaper Elevation="3" Class="pa-6 rounded-lg">
-        <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold">
-            <MudIcon Icon="@Icons.Material.Filled.Groups" Class="mr-3" />
+        <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold" Align="Align.Center">
+            <MudIcon Icon="@Icons.Material.Filled.Groups" Class="mr-3"/>
             Personas registradas
         </MudText>
 
@@ -33,12 +33,24 @@
         {
             <MudTable Items="_personas" Hover="true" Striped="true" Elevation="0" Class="mt-4">
                 <HeaderContent>
-                    <MudTh><MudText Typo="Typo.subtitle2">DNI</MudText></MudTh>
-                    <MudTh><MudText Typo="Typo.subtitle2">Nombre</MudText></MudTh>
-                    <MudTh><MudText Typo="Typo.subtitle2">Apellido</MudText></MudTh>
-                    <MudTh><MudText Typo="Typo.subtitle2">Email</MudText></MudTh>
-                    <MudTh><MudText Typo="Typo.subtitle2">Teléfono</MudText></MudTh>
-                    <MudTh><MudText Typo="Typo.subtitle2">Acciones</MudText></MudTh>
+                    <MudTh>
+                        <MudText Typo="Typo.subtitle2">DNI</MudText>
+                    </MudTh>
+                    <MudTh>
+                        <MudText Typo="Typo.subtitle2">Nombre</MudText>
+                    </MudTh>
+                    <MudTh>
+                        <MudText Typo="Typo.subtitle2">Apellido</MudText>
+                    </MudTh>
+                    <MudTh>
+                        <MudText Typo="Typo.subtitle2">Email</MudText>
+                    </MudTh>
+                    <MudTh>
+                        <MudText Typo="Typo.subtitle2">Teléfono</MudText>
+                    </MudTh>
+                    <MudTh>
+                        <MudText Typo="Typo.subtitle2">Acciones</MudText>
+                    </MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="DNI">@context.Dni</MudTd>
@@ -84,6 +96,7 @@
             Navigation.NavigateTo("/login", true);
             return;
         }
+
         CargarPersonas();
     }
 
@@ -132,6 +145,8 @@
             _personas = new List<Persona>();
             Snackbar.Add($"Error al cargar las personas: {ex.Message}", Severity.Error);
         }
+
         StateHasChanged();
     }
+
 }

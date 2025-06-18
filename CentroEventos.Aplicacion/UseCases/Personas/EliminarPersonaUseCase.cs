@@ -14,8 +14,11 @@ namespace CentroEventos.Aplicacion.UseCases.Personas
         }
         private void ValidarAsociaciones(Guid idPersona)
         {
-            if (repoEvento.ExisteEventoConResponsable(idPersona) || repoReserva.ListarPorPersona(idPersona).Count > 0)
-                throw new OperacionInvalidaException("La persona tiene eventos o reservas asociadas.");
+            if (repoEvento.ExisteEventoConResponsable(idPersona))
+                throw new OperacionInvalidaException("No se puede eliminar la persona porque es responsable de uno o más eventos deportivos.");
+
+            if (repoReserva.ListarPorPersona(idPersona).Count > 0)
+                throw new OperacionInvalidaException("No se puede eliminar la persona porque tiene reservas asociadas.");
         } 
     }
 }

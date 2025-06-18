@@ -10,7 +10,7 @@ namespace CentroEventos.Aplicacion.UseCases.Personas
         public void Ejecutar(Persona persona)
         {
             ValidadorPersona.Validar(persona);
-            if (repo.ExisteDNI(persona.Dni))
+            if (repo.ExisteDni(persona.Dni))
                 throw new DuplicadoException("Ya existe una persona con el mismo DNI.");
             repo.Agregar(persona);
             repo.GuardarCambios();

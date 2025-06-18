@@ -73,7 +73,7 @@
                         <MudText>Registra nuevas personas para tus eventos y gestiona fácilmente la participación de los asistentes.</MudText>
                     </MudCardContent>
                     <MudCardActions>
-                        <MudButton Variant="Variant.Text" Color="Color.Tertiary" EndIcon="@Icons.Material.Filled.ArrowForward">Agregar personas</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Tertiary" EndIcon="@Icons.Material.Filled.ArrowForward" OnClick="@(() => NavigationManager.NavigateTo("/personas/agregar"))">Agregar personas</MudButton>
                     </MudCardActions>
                 </MudCard>
             </MudItem>

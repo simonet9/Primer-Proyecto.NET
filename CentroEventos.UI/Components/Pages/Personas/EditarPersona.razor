@@ -10,36 +10,53 @@
 <PageTitle>Editar Persona</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
-    <MudPaper Elevation="2" Class="pa-6">
-        <MudText Typo="Typo.h5" Class="mb-4">Editar Persona</MudText>
+    <MudPaper Elevation="3" Class="pa-8 rounded-lg">
+        <MudText Typo="Typo.h4" Color="Color.Primary" Align="Align.Center" Class="mb-4 font-weight-bold">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="me-2"/>Editar Persona
+        </MudText>
         @if (_persona is null)
         {
-            <MudProgressCircular Indeterminate="true"/>
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="mx-auto d-block my-6"/>
         }
         else
         {
             <EditForm Model="_persona" OnValidSubmit="GuardarCambios">
                 <DataAnnotationsValidator/>
-
-                <MudTextField @bind-Value="_persona.Dni" Label="DNI" Required="true" Variant="Variant.Outlined"
-                              FullWidth="true" Class="mb-3"/>
-                <MudTextField @bind-Value="_persona.Nombre" Label="Nombre" Required="true" Variant="Variant.Outlined"
-                              FullWidth="true" Class="mb-3"/>
-                <MudTextField @bind-Value="_persona.Apellido" Label="Apellido" Required="true"
-                              Variant="Variant.Outlined" FullWidth="true" Class="mb-3"/>
-                <MudTextField @bind-Value="_persona.Email" Label="Email" Required="true" Variant="Variant.Outlined"
-                              FullWidth="true" InputType="InputType.Email" Class="mb-3"/>
-                <MudTextField @bind-Value="_persona.Telefono" Label="Teléfono" Required="true"
-                              Variant="Variant.Outlined" FullWidth="true" Class="mb-3"/>
-
-                <div class="d-flex justify-space-between mt-4">
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Cancelar">
-                        Cancelar
-                    </MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">
-                        Guardar
-                    </MudButton>
-                </div>
+                <MudGrid Spacing="3">
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_persona.Dni" Label="DNI" Required="true" Variant="Variant.Outlined"
+                                      Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Badge"
+                                      AdornmentColor="Color.Primary" FullWidth="true"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_persona.Nombre" Label="Nombre" Required="true" Variant="Variant.Outlined"
+                                      Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person"
+                                      AdornmentColor="Color.Primary" FullWidth="true"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_persona.Apellido" Label="Apellido" Required="true" Variant="Variant.Outlined"
+                                      Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person"
+                                      AdornmentColor="Color.Primary" FullWidth="true"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_persona.Email" Label="Correo Electrónico" Required="true" Variant="Variant.Outlined"
+                                      InputType="InputType.Email" Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Email" AdornmentColor="Color.Primary" FullWidth="true"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_persona.Telefono" Label="Teléfono" Variant="Variant.Outlined"
+                                      Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Phone"
+                                      AdornmentColor="Color.Primary" FullWidth="true"/>
+                    </MudItem>
+                    <MudItem xs="12" class="d-flex justify-space-between mt-6">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Cancelar" StartIcon="@Icons.Material.Filled.ArrowBack">
+                            Cancelar
+                        </MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" StartIcon="@Icons.Material.Filled.Save">
+                            Guardar
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
             </EditForm>
         }
     </MudPaper>
@@ -49,15 +66,15 @@
     [Parameter] public Guid Id { get; set; }
 
     private Persona? _persona;
-    private bool _usuarioEstaLogueado;
 
     protected override void OnInitialized()
     {
-        _usuarioEstaLogueado = UsuarioLogueado.ExisteUsuarioLogueado();
-
-        if (!_usuarioEstaLogueado)
+        var usuarioLogueado = UsuarioLogueado.UsuarioActual;
+        if (usuarioLogueado == null)
+        {
+            Navigation.NavigateTo("/login", true);
             return;
-
+        }
         try
         {
             _persona = RepositorioPersona.BuscarPorId(Id);
@@ -76,7 +93,7 @@
     {
         try
         {
-            ModificarPersonaUseCase.Ejecutar(_persona!);
+            if (_persona != null) ModificarPersonaUseCase.Ejecutar(_persona);
             Snackbar.Add("Persona modificada correctamente", Severity.Success);
             Navigation.NavigateTo("/personas/listar");
         }
@@ -90,5 +107,4 @@
     {
         Navigation.NavigateTo("/personas/listar");
     }
-
 }

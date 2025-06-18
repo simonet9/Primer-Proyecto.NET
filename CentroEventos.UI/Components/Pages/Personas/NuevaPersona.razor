@@ -1,24 +1,26 @@
 @page "/personas/agregar"
 @using CentroEventos.Aplicacion.UseCases.Personas
 @using CentroEventos.Aplicacion.Entities
+
+@using CentroEventos.Aplicacion.Service
 @inject AgregarPersonaUseCase RegistrarPersonaUseCase
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
-
+@inject UsuarioLogueado UsuarioLogueado
 <div class="container-fluid py-4">
     <MudContainer MaxWidth="MaxWidth.Medium">
-        <MudPaper Elevation="3" Class="pa-6 rounded-lg">
-            <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold d-flex justify-center align-items-center text-center">
-                <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Class="mr-3 mt-3"/>
-                nuevas Persona
+        <MudPaper Elevation="1" Class="pa-8 rounded-lg">
+            <MudText Typo="Typo.h4" Color="Color.Primary" Align="Align.Center" Class="mb-6 font-weight-bold d-flex justify-center align-items-center">
+                <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Class="me-2" />
+                Nueva Persona
             </MudText>
             <FormularioNuevaPersona OnGuardar="CrearPersona" OnError="ManejarError"/>
-            <div class="d-flex justify-start mt-4">
+            <div class="d-flex justify-end mt-6">
                 <MudButton Variant="Variant.Outlined"
                            Color="Color.Secondary"
                            StartIcon="@Icons.Material.Filled.ArrowBack"
-                           Size="Size.Medium"
-                           Class="rounded-lg px-4"
+                           Size="Size.Large"
+                           Class="rounded-lg px-5 py-2"
                            OnClick="Volver">
                     Volver
                 </MudButton>
@@ -29,8 +31,7 @@
 
 @code {
 
-
-    private async Task CrearPersona((string DNI,string Nombre, string Apellido, string Email, string telefono) datos)
+    private async Task CrearPersona((string DNI, string Nombre, string Apellido, string Email, string telefono) datos)
     {
         try
         {
@@ -41,8 +42,7 @@
                 datos.Email,
                 datos.telefono
             );
-            await Task.Run(() => RegistrarPersonaUseCase.Ejecutar(
-                persona));
+            await Task.Run(() => RegistrarPersonaUseCase.Ejecutar(persona));
             Snackbar.Add("Persona creada con éxito", Severity.Success);
             Volver();
         }
@@ -62,4 +62,10 @@
         NavigationManager.NavigateTo("/personas/listar");
     }
 
+    protected override void OnInitialized()
+    {
+        var usuarioLogueado = UsuarioLogueado.UsuarioActual;
+        if (usuarioLogueado != null) return;
+        NavigationManager.NavigateTo("/login", true);
+    }
 }
