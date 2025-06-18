@@ -1,0 +1,73 @@
+@page "/personas/agregar"
+@using CentroEventos.Aplicacion.Enum
+@using CentroEventos.Aplicacion.Service
+@using CentroEventos.Aplicacion.UseCases.Personas
+@using CentroEventos.Aplicacion.Entities
+@inject AgregarPersonaUseCase RegistrarPersonaUseCase
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<div class="container-fluid py-4">
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudPaper Elevation="3" Class="pa-6 rounded-lg">
+            <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold d-flex justify-center align-items-center text-center">
+                <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Class="mr-3 mt-3"/>
+                nuevas Persona
+            </MudText>
+            <FormularioNuevaPersona OnGuardar="CrearPersona" OnError="ManejarError"/>
+            <div class="d-flex justify-start mt-4">
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.ArrowBack"
+                           Size="Size.Medium"
+                           Class="rounded-lg px-4"
+                           OnClick="Volver">
+                    Volver
+                </MudButton>
+            </div>
+        </MudPaper>
+    </MudContainer>
+</div>
+
+@code {
+
+
+    private async Task CrearPersona((string DNI,string Nombre, string Apellido, string Email, string telefono) datos)
+    {
+        try
+        {
+            var persona = new Persona(
+                datos.DNI,
+                datos.Nombre,
+                datos.Apellido,
+                datos.Email,
+                datos.telefono
+            );
+            await Task.Run(() => RegistrarPersonaUseCase.Ejecutar(
+                persona));
+                
+                
+                Snackbar.Add("Usuario creado con éxito", Severity.Success);
+                Volver();
+
+            //await OnGuardar.InvokeAsync((datos.DNI, datos.Nombre, datos.Apellido, datos.Email, datos.telefono));
+            Snackbar.Add("Persona creada con éxito", Severity.Success);
+            Volver();
+        }
+        catch (Exception ex)
+        {
+            ManejarError(ex.Message);
+        }
+    }
+
+    private void ManejarError(string mensaje)
+    {
+        Snackbar.Add(mensaje, Severity.Error);
+    }
+
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/personas/listar");
+    }
+
+}
