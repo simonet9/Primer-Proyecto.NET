@@ -1,6 +1,4 @@
 @page "/personas/agregar"
-@using CentroEventos.Aplicacion.Enum
-@using CentroEventos.Aplicacion.Service
 @using CentroEventos.Aplicacion.UseCases.Personas
 @using CentroEventos.Aplicacion.Entities
 @inject AgregarPersonaUseCase RegistrarPersonaUseCase
@@ -45,12 +43,6 @@
             );
             await Task.Run(() => RegistrarPersonaUseCase.Ejecutar(
                 persona));
-                
-                
-                Snackbar.Add("Usuario creado con éxito", Severity.Success);
-                Volver();
-
-            //await OnGuardar.InvokeAsync((datos.DNI, datos.Nombre, datos.Apellido, datos.Email, datos.telefono));
             Snackbar.Add("Persona creada con éxito", Severity.Success);
             Volver();
         }

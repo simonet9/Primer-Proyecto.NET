@@ -1,61 +1,61 @@
 ﻿@page "/personas/listar"
-@using CentroEventos.Aplicacion.Entities
-@inject CentroEventos.Aplicacion.UseCases.Personas.ListarPersonasUseCase ListarPersonasUseCase
-
-<MudText Typo="Typo.h3" Class="mb-4">Personas registradas</MudText>
-
-@if (!string.IsNullOrEmpty(_error))
-{
-    <MudAlert Severity="Severity.Error">@_error</MudAlert>
-}
-else if (_personas.Count == 0)
-{
-    <MudAlert Severity="Severity.Info">No hay personas registradas.</MudAlert>
-}
-else
-{
-    <MudPaper Class="pa-4">
-        <MudTable Items="@_personas" Dense="true" Hover="true" Bordered="true" Striped="true">
-            <HeaderContent>
-                <MudTh>DNI</MudTh>
-                <MudTh>Nombre</MudTh>
-                <MudTh>Apellido</MudTh>
-                <MudTh>Email</MudTh>
-                <MudTh>Teléfono</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd>@context.Dni</MudTd>
-                <MudTd>@context.Nombre</MudTd>
-                <MudTd>@context.Apellido</MudTd>
-                <MudTd>@context.Email</MudTd>
-                <MudTd>@context.Telefono</MudTd>
-            </RowTemplate>
-        </MudTable>
-    </MudPaper>
-}
-
-@code {
-
-    private List<Persona> _personas = new()
-    {
-        new Persona("12345678A", "Juan", "Pérez", "juan@mail.com", "123456789"),
-        new Persona("87654321B", "María", "García", "maria@mail.com", "987654321"),
-        new Persona("11111111C", "Pedro", "López", "pedro@mail.com", "555555555")
-    };
-
-    private string? _error;
-
-    protected override void OnInitialized()
-    {
-        try
-        {
-            //_personas = ListarPersonasUseCase.Ejecutar();
+        @using CentroEventos.Aplicacion.Entities
+        @inject CentroEventos.Aplicacion.UseCases.Personas.ListarPersonasUseCase ListarPersonasUseCase
+        
+        <div class="container-fluid">
+            <MudPaper Elevation="3" Class="pa-6 rounded-lg">
+                <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold">
+                    <MudIcon Icon="@Icons.Material.Filled.Groups" Class="mr-3" />
+                    Personas registradas
+                </MudText>
+        
+                @if (!string.IsNullOrEmpty(_error))
+                {
+                    <MudAlert Severity="Severity.Error">@_error</MudAlert>
+                }
+                else if (_personas.Count == 0)
+                {
+                    <MudAlert Severity="Severity.Info">No hay personas registradas.</MudAlert>
+                }
+                else
+                {
+                    <MudTable Items="_personas" Hover="true" Striped="true" Elevation="0" Class="mt-4">
+                        <HeaderContent>
+                            <MudTh><MudText Typo="Typo.subtitle2">DNI</MudText></MudTh>
+                            <MudTh><MudText Typo="Typo.subtitle2">Nombre</MudText></MudTh>
+                            <MudTh><MudText Typo="Typo.subtitle2">Apellido</MudText></MudTh>
+                            <MudTh><MudText Typo="Typo.subtitle2">Email</MudText></MudTh>
+                            <MudTh><MudText Typo="Typo.subtitle2">Teléfono</MudText></MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="DNI">@context.Dni</MudTd>
+                            <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
+                            <MudTd DataLabel="Apellido">@context.Apellido</MudTd>
+                            <MudTd DataLabel="Email">@context.Email</MudTd>
+                            <MudTd DataLabel="Teléfono">@context.Telefono</MudTd>
+                        </RowTemplate>
+                        <LoadingContent>
+                            <MudText Class="pa-4" Align="Align.Center">Cargando personas...</MudText>
+                        </LoadingContent>
+                    </MudTable>
+                }
+            </MudPaper>
+        </div>
+        
+        @code {
+            private List<Persona> _personas = new();
+            private string? _error;
+        
+            protected override void OnInitialized()
+            {
+                try
+                {
+                    _personas = ListarPersonasUseCase.Ejecutar();
+                }
+                catch (Exception ex)
+                {
+                    _personas = new List<Persona>();
+                    _error = ex.Message;
+                }
+            }
         }
-        catch (Exception ex)
-        {
-            _personas = new List<Persona>();
-            _error = ex.Message;
-        }
-    }
-
-}
