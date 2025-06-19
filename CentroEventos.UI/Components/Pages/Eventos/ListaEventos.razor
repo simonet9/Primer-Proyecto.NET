@@ -19,13 +19,22 @@
             <MudIcon Icon="@Icons.Material.Filled.Event" Class="mr-3"/>
             Eventos Deportivos
         </MudText>
-        @if (_mensajeError is not null)
+        @if (TienePermisoCrear)
         {
-            <MudAlert Severity="Severity.Error">@_mensajeError</MudAlert>
+            <div class="d-flex justify-end mb-4">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Success"
+                           StartIcon="@Icons.Material.Filled.PersonAdd"
+                           Size="Size.Medium"
+                           Class="rounded-lg px-4"
+                           OnClick="AgregarEvento">
+                    Agregar evento
+                </MudButton>
+            </div>
         }
-        else if (_eventos is null)
+        @if (_eventos == null || !_eventos.Any())
         {
-            <MudProgressCircular Indeterminate="true"/>
+            <MudAlert Severity="Severity.Info">No hay eventos registrados.</MudAlert>
         }
         else
         {
@@ -91,9 +100,6 @@
                         </MudTd>
                     }
                 </RowTemplate>
-                <LoadingContent>
-                    <MudText Class="pa-4" Align="Align.Center">Cargando eventos...</MudText>
-                </LoadingContent>
             </MudTable>
         }
     </MudPaper>
@@ -104,6 +110,7 @@
     private List<EventoDeportivo>? _eventos = new();
 
     private Guid IdUsuario => User.UsuarioActual?.Id ?? Guid.Empty;
+    private bool TienePermisoCrear => Service.PoseeElPermiso(IdUsuario, Permiso.EventoAlta);
     private bool TienePermisoModificar => Service.PoseeElPermiso(IdUsuario, Permiso.EventoModificacion);
     private bool TienePermisoEliminar => Service.PoseeElPermiso(IdUsuario, Permiso.EventoBaja);
 
@@ -135,10 +142,18 @@
         }
     }
 
+    protected override void OnInitialized()
+    {
+        var usuarioLogueado = User.UsuarioActual;
+        if (usuarioLogueado == null)
+        {
+            Navigation.NavigateTo("/login", true);
+            return;
+        }
 
-    private string? _mensajeError;
-
-    protected override Task OnInitializedAsync()
+        CargarEventos();
+    }
+    private void CargarEventos()
     {
         try
         {
@@ -146,10 +161,13 @@
         }
         catch (Exception ex)
         {
-            _mensajeError = ex.Message;
+            _eventos = new List<EventoDeportivo>();
+            Snackbar.Add($"Error al cargar los eventos: {ex.Message}", Severity.Error);
         }
-
-        return Task.CompletedTask;
+    }
+    private void AgregarEvento()
+    {
+        Navigation.NavigateTo("/eventos/agregar");
     }
 
 }

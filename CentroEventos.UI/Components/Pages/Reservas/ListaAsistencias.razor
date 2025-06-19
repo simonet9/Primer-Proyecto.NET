@@ -1,0 +1,78 @@
+@page "/eventos/asistencias/{EventoId:guid}"
+@using CentroEventos.Aplicacion.Entities
+@using CentroEventos.Aplicacion.Service
+@using CentroEventos.Aplicacion.UseCases.Reservas
+@inject ListarAsistenciaAEventoUseCase ListarAsistenciaUseCase
+@inject NavigationManager NavigationManager
+@inject UsuarioLogueado UsuarioLogueado
+@inject ISnackbar Snackbar
+
+<PageTitle>Lista de Asistentes</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <MudText Typo="Typo.h5" Class="mb-4">Lista de Asistentes al Evento</MudText>
+
+    @if (_asistentes.Any())
+    {
+        <MudPaper>
+            <MudTable Items="_asistentes" Dense="true" Hover="true" Striped="true">
+                <HeaderContent>
+                    <MudTh>DNI</MudTh>
+                    <MudTh>Nombre</MudTh>
+                    <MudTh>Apellido</MudTh>
+                    <MudTh>Email</MudTh>
+                    <MudTh>Teléfono</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="DNI">@context.Dni</MudTd>
+                    <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
+                    <MudTd DataLabel="Apellido">@context.Apellido</MudTd>
+                    <MudTd DataLabel="Email">@context.Email</MudTd>
+                    <MudTd DataLabel="Teléfono">@context.Telefono</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudPaper>
+    }
+    else
+    {
+        <MudAlert Severity="Severity.Info">No hay personas registradas.</MudAlert>
+    }
+    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3" OnClick="Volver">
+        Volver
+    </MudButton>
+</MudContainer>
+
+@code {
+    [Parameter] public Guid EventoId { get; set; }
+
+    private List<Persona> _asistentes = new();
+
+    protected override void OnInitialized()
+    {
+        var usuarioLogueado = UsuarioLogueado.UsuarioActual;
+        if (usuarioLogueado == null)
+        {
+            NavigationManager.NavigateTo("/login", true);
+        }
+        CargarAsistentes();
+    }
+
+    private void CargarAsistentes()
+    {
+        try
+        {
+            _asistentes = ListarAsistenciaUseCase.Ejecutar(EventoId);
+        }
+        catch (Exception ex)
+        {
+            _asistentes = new List<Persona>();
+            Snackbar.Add($"Error al cargar las personas: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/reservas/listar");
+    }
+
+}

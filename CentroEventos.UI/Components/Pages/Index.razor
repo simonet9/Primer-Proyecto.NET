@@ -31,7 +31,7 @@
                         <MudText>Crea y gestiona todos tus eventos desde un único lugar. Organiza conferencias, talleres y reuniones.</MudText>
                     </MudCardContent>
                     <MudCardActions>
-                        <MudButton Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ArrowForward">Explorar eventos</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ArrowForward" OnClick="@(() => NavigationManager.NavigateTo("/eventos/listar"))">Explorar eventos</MudButton>
                     </MudCardActions>
                 </MudCard>
             </MudItem>
@@ -52,7 +52,7 @@
                         <MudText>Reserva tu asistencia a los eventos disponibles y gestiona tus confirmaciones fácilmente.</MudText>
                     </MudCardContent>
                     <MudCardActions>
-                        <MudButton Variant="Variant.Text" Color="Color.Secondary" EndIcon="@Icons.Material.Filled.ArrowForward">Ver reservas</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Secondary" EndIcon="@Icons.Material.Filled.ArrowForward" OnClick="@(() => NavigationManager.NavigateTo("/reservas/listar"))">Ver reservas</MudButton>
                     </MudCardActions>
                 </MudCard>
             </MudItem>
