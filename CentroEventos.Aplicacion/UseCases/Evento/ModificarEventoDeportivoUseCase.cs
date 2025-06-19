@@ -1,6 +1,5 @@
 using CentroEventos.Aplicacion.Entities;
 using CentroEventos.Aplicacion.Enum;
-using CentroEventos.Aplicacion.Exceptions;
 using CentroEventos.Aplicacion.Interfaces;
 using CentroEventos.Aplicacion.Validators;
 

@@ -7,8 +7,8 @@ public class EventoDeportivo
     public string Nombre { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public DateTime FechaHoraInicio { get; set; } = DateTime.Now;
-    public double DurationHoras { get; set; } = 0;
-    public int CupoMaximo { get; set; } = 0;
+    public double DurationHoras { get; set; }
+    public int CupoMaximo { get; set; }
     public Guid ResponsableId { get; set; } = Guid.Empty;
 
     public EventoDeportivo(string nombre, string description, DateTime fechaHoraInicio, double durationHoras, int cupoMaximo, Guid responsableId)

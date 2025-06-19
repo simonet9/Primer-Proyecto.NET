@@ -1,5 +1,4 @@
 ﻿using CentroEventos.Aplicacion.Exceptions;
-using CentroEventos.Aplicacion.Interfaces;
 
 namespace CentroEventos.Aplicacion.Validators;
 
