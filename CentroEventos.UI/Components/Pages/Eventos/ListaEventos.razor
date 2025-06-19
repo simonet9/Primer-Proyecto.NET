@@ -136,9 +136,16 @@
 
         if (resultado == true)
         {
-            EliminarEventoUseCase.Ejecutar(evento.Id, IdUsuario);
-            _eventos = Listar.Ejecutar();
-            Snackbar.Add("Evento eliminado con éxito", Severity.Success);
+            try
+            {
+                EliminarEventoUseCase.Ejecutar(evento.Id, IdUsuario);
+                CargarEventos();
+                Snackbar.Add("Evento eliminado con éxito", Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error al eliminar el evento: {ex.Message}", Severity.Error);
+            }
         }
     }
 
@@ -153,6 +160,7 @@
 
         CargarEventos();
     }
+
     private void CargarEventos()
     {
         try
@@ -165,6 +173,7 @@
             Snackbar.Add($"Error al cargar los eventos: {ex.Message}", Severity.Error);
         }
     }
+
     private void AgregarEvento()
     {
         Navigation.NavigateTo("/eventos/agregar");

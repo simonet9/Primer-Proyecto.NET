@@ -1,0 +1,193 @@
+﻿@page "/reservas/listar"
+@using CentroEventos.Aplicacion.Entities
+@using CentroEventos.Aplicacion.Enum
+@using CentroEventos.Aplicacion.Interfaces
+@using CentroEventos.Aplicacion.Service
+@using CentroEventos.Aplicacion.UseCases.Reservas
+@inject ListarReservasUseCase ListarReservasUseCase
+@inject UsuarioLogueado UsuarioLogueado
+@inject IServicioAutorizacion Service
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject EliminarReservaUseCase EliminarReservaUseCase
+@inject IRepositorioPersona RepositorioPersona
+@inject IRepositorioEventoDeportivo RepositorioEventoDeportivo
+
+<div class="container-fluid">
+    <MudPaper Elevation="3" Class="pa-6 rounded-lg">
+        <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold">
+            <MudIcon Icon="@Icons.Material.Filled.BookOnline" Class="mr-3"/>
+            Reservas
+        </MudText>
+
+        @if (TienePermisoAgregar)
+        {
+            <div class="d-flex justify-end mb-4">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Success"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           Size="Size.Medium"
+                           Class="rounded-lg px-4"
+                           OnClick="AgregarReserva">
+                    Agregar Reserva
+                </MudButton>
+            </div>
+        }
+
+        @if (!_reservas.Any())
+        {
+            <MudAlert Severity="Severity.Info">No hay reservas registradas.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="_reservas" Hover="true" Striped="true" Elevation="0" Class="mt-4">
+                <HeaderContent>
+                    <MudTh>
+                        <MudText Typo="Typo.subtitle2">Persona</MudText>
+                    </MudTh>
+                    <MudTh>
+                        <MudText Typo="Typo.subtitle2">Evento</MudText>
+                    </MudTh>
+                    <MudTh>
+                        <MudText Typo="Typo.subtitle2">Fecha Reserva</MudText>
+                    </MudTh>
+                    <MudTh>
+                        <MudText Typo="Typo.subtitle2">Estado</MudText>
+                    </MudTh>
+                    @if (TienePermisoModificar || TienePermisoEliminar)
+                    {
+                        <MudTh>
+                            <MudText Typo="Typo.subtitle2">Acciones</MudText>
+                        </MudTh>
+                    }
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Persona">@ObtenerNombrePersona(context.PersonaId)</MudTd>
+                    <MudTd DataLabel="Evento">@ObtenerNombreEvento(context.EventoDeportivoId)</MudTd>
+                    <MudTd DataLabel="Fecha Reserva">@context.FechaAltaReserva.ToString("g")</MudTd>
+                    <MudTd DataLabel="Estado">@context.EstadoAsistencia</MudTd>
+                    <MudTd>
+                        <MudButton Color="Color.Info"
+                                   Variant="Variant.Filled"
+                                   Size="Size.Small"
+                                   StartIcon="@Icons.Material.Filled.Visibility"
+                                   Class="rounded-lg px-3"
+                                   OnClick="@(() => VerAsistentes(context.EventoDeportivoId))">
+                            Ver Asistentes
+                        </MudButton>
+                        @if (TienePermisoModificar || TienePermisoEliminar)
+                        {
+                            @if (TienePermisoModificar)
+                            {
+                                <MudButton Color="Color.Primary"
+                                           Variant="Variant.Filled"
+                                           Size="Size.Small"
+                                           StartIcon="@Icons.Material.Filled.Edit"
+                                           Class="ml-2 rounded-lg px-3"
+                                           OnClick="@(() => ModificarReserva(context))">
+                                    Modificar
+                                </MudButton>
+                            }
+
+                            @if (TienePermisoEliminar)
+                            {
+                                <MudButton Color="Color.Error"
+                                           Variant="Variant.Filled"
+                                           Size="Size.Small"
+                                           StartIcon="@Icons.Material.Filled.Delete"
+                                           Class="ml-2 rounded-lg px-3"
+                                           OnClick="@(() => ConfirmarEliminar(context))">
+                                    Eliminar
+                                </MudButton>
+                            }
+                        }
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudPaper>
+</div>
+
+@code {
+    private List<Reserva> _reservas = new();
+    private Guid IdUsuario => UsuarioLogueado.UsuarioActual?.Id ?? Guid.Empty;
+    private bool TienePermisoAgregar => Service.PoseeElPermiso(IdUsuario, Permiso.ReservaAlta);
+    private bool TienePermisoModificar => Service.PoseeElPermiso(IdUsuario, Permiso.ReservaModificacion);
+    private bool TienePermisoEliminar => Service.PoseeElPermiso(IdUsuario, Permiso.ReservaBaja);
+
+    protected override void OnInitialized()
+    {
+        var usuarioLogueado = UsuarioLogueado.UsuarioActual;
+        if (usuarioLogueado == null)
+        {
+            Navigation.NavigateTo("/login", true);
+            return;
+        }
+
+        CargarReservas();
+    }
+
+    private void CargarReservas()
+    {
+        try
+        {
+            _reservas = ListarReservasUseCase.Ejecutar();
+        }
+        catch (Exception ex)
+        {
+            _reservas = new List<Reserva>();
+            Snackbar.Add($"Error al cargar las reservas: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private string ObtenerNombrePersona(Guid personaId)
+    {
+        var persona = RepositorioPersona.BuscarPorId(personaId)!;
+        return $"{persona.Nombre} {persona.Apellido}";
+    }
+
+    private string ObtenerNombreEvento(Guid eventoId)
+    {
+        var evento = RepositorioEventoDeportivo.BuscarPorId(eventoId)!;
+        return evento.Nombre;
+    }
+
+    private void AgregarReserva()
+    {
+        Navigation.NavigateTo("/reservas/agregar");
+    }
+
+    private void ModificarReserva(Reserva reserva)
+    {
+        Navigation.NavigateTo($"/reservas/modificar/{reserva.Id}");
+    }
+
+    private async Task ConfirmarEliminar(Reserva reserva)
+    {
+        var resultado = await DialogService.ShowMessageBox(
+            "Confirmar",
+            "¿Desea eliminar esta reserva?",
+            yesText: "Eliminar",
+            cancelText: "Cancelar");
+
+        if (resultado == true)
+        {
+            try
+            {
+                EliminarReservaUseCase.Ejecutar(reserva.Id, IdUsuario);
+                Snackbar.Add("Reserva eliminada con éxito", Severity.Success);
+                CargarReservas();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error al eliminar: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+    private void VerAsistentes(Guid eventoId)
+    {
+        Navigation.NavigateTo($"/eventos/asistencias/{eventoId}");
+    }
+}

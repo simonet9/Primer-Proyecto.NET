@@ -7,20 +7,25 @@
 @inject ISnackbar Snackbar
 @inject UsuarioLogueado usuarioLogueado
 
-<PageTitle>Eventos con Cupo Disponible</PageTitle>
+<div class="container-fluid">
+    <MudPaper Elevation="3" Class="pa-6 rounded-lg">
+        <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold">
+            <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Class="mr-3"/>
+            Eventos con Cupo Disponible
+        </MudText>
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
-    <MudText Typo="Typo.h5" Class="mb-4">Eventos con Cupo Disponible</MudText>
-
-    @if (_eventos.Any())
-    {
-        <MudPaper>
-            <MudTable Items="_eventos" Dense="true" Hover="true" Striped="true">
+        @if (!_eventos.Any())
+        {
+            <MudAlert Severity="Severity.Info">No hay eventos con cupo disponible.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="_eventos" Hover="true" Striped="true" Elevation="0" Class="mt-4">
                 <HeaderContent>
-                    <MudTh>Nombre</MudTh>
-                    <MudTh>Descripción</MudTh>
-                    <MudTh>Fecha y Hora</MudTh>
-                    <MudTh>Cupo Máximo</MudTh>
+                    <MudTh><MudText Typo="Typo.subtitle2">Nombre</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.subtitle2">Descripción</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.subtitle2">Fecha y Hora</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.subtitle2">Cupo Máximo</MudText></MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
@@ -28,17 +33,19 @@
                     <MudTd DataLabel="Fecha y Hora">@context.FechaHoraInicio.ToString("g")</MudTd>
                     <MudTd DataLabel="Cupo Máximo">@context.CupoMaximo</MudTd>
                 </RowTemplate>
+                <LoadingContent>
+                    <MudText Class="pa-4" Align="Align.Center">Cargando eventos...</MudText>
+                </LoadingContent>
             </MudTable>
-        </MudPaper>
-    }
-    else
-    {
-        <MudAlert Severity="Severity.Info">No hay eventos con cupo disponible.</MudAlert>
-    }
-    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3" OnClick="Volver">
-        Volver
-    </MudButton>
-</MudContainer>
+        }
+
+        <div class="d-flex justify-end mt-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Volver">
+                Volver
+            </MudButton>
+        </div>
+    </MudPaper>
+</div>
 
 @code {
     private List<EventoDeportivo> _eventos = new();

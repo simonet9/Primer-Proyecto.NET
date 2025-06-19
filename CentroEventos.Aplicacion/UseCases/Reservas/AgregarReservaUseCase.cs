@@ -19,6 +19,7 @@ namespace CentroEventos.Aplicacion.UseCases.Reservas
             if (repoReserva.BuscarPorId(datosReserva.Id) != null)
                 throw new OperacionInvalidaException("Ya existe una reserva con el mismo ID.");
             repoReserva.Agregar(datosReserva);
+            repoReserva.GuardarCambios();
         }
     }
 }

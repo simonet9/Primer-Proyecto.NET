@@ -11,6 +11,6 @@ namespace CentroEventos.Aplicacion.Interfaces
         List<EventoDeportivo> Listar();
         void GuardarCambios();
         bool ExisteEventoConResponsable(Guid responsableId);
-
+        EventoDeportivo? BuscarPorNombre(string nombre);
     }
 }

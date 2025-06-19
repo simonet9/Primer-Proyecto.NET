@@ -1,0 +1,110 @@
+@namespace CentroEventos.UI.Components.Pages.Reservas
+@using System.ComponentModel.DataAnnotations
+@using CentroEventos.Aplicacion.Enum
+@inherits Microsoft.AspNetCore.Components.ComponentBase
+
+<MudForm @ref="_form" Model="_modelo">
+    <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4">Crear Nueva Reserva</MudText>
+    <MudGrid Spacing="3">
+        <MudItem xs="12">
+            <MudTextField T="string" @bind-Value="_modelo.NombreEvento" Label="Nombre del Evento" Required="true"
+                        RequiredError="El nombre del evento es requerido" Variant="Variant.Outlined"
+                        Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Event"
+                        AdornmentColor="Color.Primary" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudDatePicker T="DateTime" Date="_modelo.FechaAltaReserva" DateChanged="@(date => _modelo.FechaAltaReserva = date ?? DateTime.Today)" 
+                         Label="Fecha de Reserva" Required="true"
+                         RequiredError="La fecha de reserva es requerida" Variant="Variant.Outlined"
+                         Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.CalendarToday"
+                         AdornmentColor="Color.Primary" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudSelect T="Estado" @bind-Value="_modelo.EstadoAsistencia" Label="Estado Asistencia" Required="true"
+                     RequiredError="El estado de asistencia es requerido" Variant="Variant.Outlined"
+                     Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.CheckCircle"
+                     AdornmentColor="Color.Primary">
+                @foreach (var estado in Enum.GetValues<Estado>())
+                {
+                    <MudSelectItem Value="@estado">@estado.ToString()</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudTextField T="string" @bind-Value="_modelo.DniResponsable" Label="DNI del Responsable" Required="true"
+                        RequiredError="Debe ingresar un DNI válido" Variant="Variant.Outlined"
+                        Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Badge"
+                        AdornmentColor="Color.Primary" />
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudButton Variant="Variant.Filled"
+                    Color="Color.Primary"
+                    FullWidth="true"
+                    Size="Size.Large"
+                    OnClick="ProcesarFormulario"
+                    Disabled="_procesando"
+                    StartIcon="@Icons.Material.Filled.Save"
+                    Class="mt-4 py-2">
+                Crear reserva
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</MudForm>
+
+@code {
+    [Parameter] public EventCallback<(string nombreEvento, DateTime fechaAltaReserva, Estado estadoAsistencia, string responsableDni)> OnGuardar { get; set; }
+    [Parameter] public EventCallback<string> OnError { get; set; }
+    private MudForm? _form;
+    private bool _procesando;
+    private readonly FormularioReservaModel _modelo = new();
+
+    private async Task ProcesarFormulario()
+    {
+        if (_form != null)
+        {
+            await _form.Validate();
+            if (!_form.IsValid)
+                return;
+        }
+
+        try
+        {
+            _procesando = true;
+
+            await OnGuardar.InvokeAsync((
+                _modelo.NombreEvento, 
+                _modelo.FechaAltaReserva, 
+                _modelo.EstadoAsistencia, 
+                _modelo.DniResponsable
+            ));
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+        finally
+        {
+            _procesando = false;
+        }
+    }
+
+    private class FormularioReservaModel
+    {
+        [Required(ErrorMessage = "El nombre del evento es requerido")]
+        public string NombreEvento { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La fecha de reserva es requerida")]
+        public DateTime FechaAltaReserva { get; set; } = DateTime.Today;
+
+        [Required(ErrorMessage = "El estado de asistencia es requerido")]
+        public Estado EstadoAsistencia { get; set; } = Estado.Pendiente;
+
+        [Required(ErrorMessage = "El DNI del responsable es requerido")]
+        [RegularExpression(@"^[A-Za-z0-9-]*$", ErrorMessage = "El DNI solo puede contener letras, números y guiones")]
+        public string DniResponsable { get; set; } = string.Empty;
+    }
+}

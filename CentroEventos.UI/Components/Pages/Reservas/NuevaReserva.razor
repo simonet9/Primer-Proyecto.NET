@@ -1,0 +1,84 @@
+@page "/reservas/agregar"
+@using CentroEventos.Aplicacion.Service
+@using CentroEventos.Aplicacion.Entities
+@using CentroEventos.Aplicacion.Enum
+@using CentroEventos.Aplicacion.Exceptions
+@using CentroEventos.Aplicacion.Interfaces
+@using CentroEventos.Aplicacion.UseCases.Reservas
+@inject ReservaAltaUseCase RegistrarReservaUseCase
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject UsuarioLogueado User
+@inject IRepositorioPersona RepositorioPersona
+@inject IRepositorioEventoDeportivo RepositorioEventoDeportivo
+
+<div class="container-fluid py-4">
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudPaper Elevation="3" Class="pa-6 rounded-lg">
+            <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold d-flex justify-center align-items-center text-center">
+                <MudIcon Icon="@Icons.Material.Filled.EventNote" Class="mr-3 mt-3"/>
+                Nueva Reserva
+            </MudText>
+            <FormularioNuevaReserva OnGuardar="CrearReserva" OnError="ManejarError"/>
+            <div class="d-flex justify-start mt-4">
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.ArrowBack"
+                           Size="Size.Medium"
+                           Class="rounded-lg px-4"
+                           OnClick="Volver">
+                    Volver
+                </MudButton>
+            </div>
+        </MudPaper>
+    </MudContainer>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (User.UsuarioActual == null)
+        {
+            NavigationManager.NavigateTo("/login", true);
+        }
+    }
+
+    private async Task CrearReserva((string nombreEvento, DateTime fechaAltaReserva, Estado estadoAsistencia, string responsableDni) datos)
+    {
+        try
+        {
+            var persona = RepositorioPersona.ObtenerPorDocumento(datos.responsableDni)
+                          ?? throw new EntidadNotFoundException("No se encontró la persona con el DNI indicado.");
+            var evento = RepositorioEventoDeportivo.BuscarPorNombre(datos.nombreEvento)
+                         ?? throw new EntidadNotFoundException("No se encontró el evento deportivo indicado.");
+
+            var reserva = new Reserva(
+                persona.Id,
+                evento.Id,
+                datos.fechaAltaReserva,
+                datos.estadoAsistencia
+            );
+
+            if (User.UsuarioActual != null)
+            {
+                await Task.Run(() => RegistrarReservaUseCase.Ejecutar(reserva, User.UsuarioActual.Id));
+                Snackbar.Add("Reserva creada con éxito", Severity.Success);
+                Volver();
+            }
+        }
+        catch (Exception ex)
+        {
+            ManejarError(ex.Message);
+        }
+    }
+
+    private void ManejarError(string mensaje)
+    {
+        Snackbar.Add(mensaje, Severity.Error);
+    }
+
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/reservas/listar");
+    }
+}

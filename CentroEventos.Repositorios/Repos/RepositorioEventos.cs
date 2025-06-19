@@ -8,6 +8,8 @@ namespace CentroEventos.Repositorios.Repos
     {
         public void Agregar(EventoDeportivo evento) => context.EventosDeportivos.Add(evento);
         public EventoDeportivo? BuscarPorId(Guid id) => context.EventosDeportivos.Find(id);
+        
+        public EventoDeportivo? BuscarPorNombre(string nombre) => context.EventosDeportivos.FirstOrDefault(e => e.Nombre == nombre);
         public void Eliminar(EventoDeportivo evento)=>context.EventosDeportivos.Remove(evento);
         public List<EventoDeportivo> Listar() => context.EventosDeportivos.ToList();
         public void GuardarCambios() => context.SaveChanges();
