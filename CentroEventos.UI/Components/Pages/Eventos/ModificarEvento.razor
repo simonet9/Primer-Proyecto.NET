@@ -1,0 +1,92 @@
+@page "/eventos/modificar/{Id:guid}"
+@using CentroEventos.Aplicacion.Service
+@using CentroEventos.Aplicacion.UseCases.Evento
+@using CentroEventos.Aplicacion.Entities
+@using CentroEventos.Aplicacion.Exceptions
+@using CentroEventos.Aplicacion.Interfaces
+@inject ModificarEventoDeportivoUseCase ModificarEventoUseCase
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject UsuarioLogueado User
+@inject IRepositorioPersona RepositorioPersona
+@inject IRepositorioEventoDeportivo RepositorioEvento
+
+<div class="container-fluid py-4">
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudPaper Elevation="3" Class="pa-6 rounded-lg">
+            <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-6 font-weight-bold d-flex justify-center align-items-center text-center">
+                <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Class="mr-3 mt-3"/>
+                Nuevo Evento
+            </MudText>
+            <FormularioModificarEvento Evento="_evento" OnGuardar="ModificarEventoHandler" OnError="ManejarError"/>
+            <div class="d-flex justify-start mt-4">
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.ArrowBack"
+                           Size="Size.Medium"
+                           Class="rounded-lg px-4"
+                           OnClick="Volver">
+                    Volver
+                </MudButton>
+            </div>
+        </MudPaper>
+    </MudContainer>
+</div>
+
+
+@code {
+    private EventoDeportivo? _evento;
+    [Parameter]
+    public Guid Id { get; set; }
+    protected override void OnInitialized()
+    {
+        if (!User.ExisteUsuarioLogueado())
+    {
+        NavigationManager.NavigateTo("/");
+        return;
+    }
+
+    _evento = RepositorioEvento.BuscarPorId(Id);
+    if (_evento == null)
+    {
+        Snackbar.Add("No se encontró el evento a modificar.", Severity.Error);
+        NavigationManager.NavigateTo("/eventos/listar");
+    }
+    }
+    private async Task ModificarEventoHandler((string nombre, string description, DateTime fechaHoraInicio, double durationHoras, int cupoMaximo, string responsableDni) datos)
+    {
+        try
+        {
+            var persona = RepositorioPersona.ObtenerPorDocumento(datos.responsableDni) ?? throw new EntidadNotFoundException("No se encontró la persona responsable del evento.");
+            var evento = RepositorioEvento.BuscarPorId(Id) ?? throw new EntidadNotFoundException("Evento no encontrado.");
+            evento.Nombre = datos.nombre;
+            evento.Description = datos.description;
+            evento.FechaHoraInicio = datos.fechaHoraInicio;
+            evento.DurationHoras = datos.durationHoras;
+            evento.CupoMaximo = datos.cupoMaximo;
+            evento.ResponsableId = persona.Id;
+
+            await Task.Run(() =>
+            {
+                if (User.UsuarioActual != null)
+                    ModificarEventoUseCase.Ejecutar(evento, User.UsuarioActual.Id);
+            });
+                Snackbar.Add("Evento modificado con éxito", Severity.Success);
+                Volver();
+        }
+        catch (Exception ex)
+        {
+            ManejarError(ex.Message);
+        }
+    }
+
+    private void ManejarError(string mensaje)
+    {
+        Snackbar.Add(mensaje, Severity.Error);
+    }
+
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/eventos/listar");
+    }
+}

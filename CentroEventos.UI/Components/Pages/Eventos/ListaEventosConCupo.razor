@@ -1,0 +1,74 @@
+﻿@page "/eventos/disponibles"
+@using CentroEventos.Aplicacion.Entities
+@using CentroEventos.Aplicacion.Service
+@using CentroEventos.Aplicacion.UseCases.Evento
+@inject ListarEventosConCupoDisponibleUseCase ListarEventosConCupoUseCase
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject UsuarioLogueado usuarioLogueado
+
+<PageTitle>Eventos con Cupo Disponible</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <MudText Typo="Typo.h5" Class="mb-4">Eventos con Cupo Disponible</MudText>
+
+    @if (_eventos.Any())
+    {
+        <MudPaper>
+            <MudTable Items="_eventos" Dense="true" Hover="true" Striped="true">
+                <HeaderContent>
+                    <MudTh>Nombre</MudTh>
+                    <MudTh>Descripción</MudTh>
+                    <MudTh>Fecha y Hora</MudTh>
+                    <MudTh>Cupo Máximo</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
+                    <MudTd DataLabel="Descripción">@context.Description</MudTd>
+                    <MudTd DataLabel="Fecha y Hora">@context.FechaHoraInicio.ToString("g")</MudTd>
+                    <MudTd DataLabel="Cupo Máximo">@context.CupoMaximo</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudPaper>
+    }
+    else
+    {
+        <MudAlert Severity="Severity.Info">No hay eventos con cupo disponible.</MudAlert>
+    }
+    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3" OnClick="Volver">
+        Volver
+    </MudButton>
+</MudContainer>
+
+@code {
+    private List<EventoDeportivo> _eventos = new();
+
+    protected override void OnInitialized()
+    {
+        var usuario = usuarioLogueado.UsuarioActual;
+        if (usuario == null)
+        {
+            NavigationManager.NavigateTo("/login", true);
+            return;
+        }
+        CargarEventos();
+    }
+
+    private void CargarEventos()
+    {
+        try
+        {
+            _eventos = ListarEventosConCupoUseCase.Ejecutar();
+        }
+        catch (Exception ex)
+        {
+            _eventos = new List<EventoDeportivo>();
+            Snackbar.Add($"Error al cargar los eventos: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/eventos/listar");
+    }
+}
