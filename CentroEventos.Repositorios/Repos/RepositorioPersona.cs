@@ -6,6 +6,7 @@ namespace CentroEventos.Repositorios.Repos;
 
 public class RepositorioPersona(MyContext context) : IRepositorioPersona
 {
+    public bool ObtenerPorEmail(string email) => context.Personas.Any(p => p.Email == email);
     public void Agregar(Persona persona)=>context.Personas.Add(persona);        
     public Persona? BuscarPorId(Guid id) => context.Personas.FirstOrDefault(p => p.Id == id);
     public Persona? ObtenerPorDocumento(string documento) => context.Personas.FirstOrDefault(p => p.Dni == documento || p.Email == documento);

@@ -12,5 +12,6 @@ namespace CentroEventos.Aplicacion.Interfaces
         void GuardarCambios();
         List<Persona> Listar();
         Persona? ObtenerPorDocumento(string documento);
+        bool ObtenerPorEmail(string email);
     }
 }

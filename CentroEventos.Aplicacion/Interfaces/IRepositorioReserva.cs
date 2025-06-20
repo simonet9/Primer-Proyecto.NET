@@ -14,5 +14,6 @@ namespace CentroEventos.Aplicacion.Interfaces
         void GuardarCambios();
         List<Reserva> ListarPorEvento(Guid eventoId);
         List<Reserva> ListarPorPersona(Guid personaId);
+        bool BuscarPersonaPorReserva(Guid personaId);
     }
 }

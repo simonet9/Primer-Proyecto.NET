@@ -7,6 +7,8 @@ namespace CentroEventos.Repositorios.Repos
 {
     public class RepositorioReserva(MyContext context) : IRepositorioReserva
     {
+        public bool BuscarPersonaPorReserva(Guid personaId) => context.Reservas.Any(r => r.PersonaId == personaId);
+
         public void Agregar(Reserva reserva) => context.Reservas.Add(reserva);
         public Reserva? BuscarPorId(Guid id) => context.Reservas.Find(id);
         public void Eliminar(Reserva reserva) => context.Reservas.Remove(reserva);

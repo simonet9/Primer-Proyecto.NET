@@ -18,6 +18,8 @@ namespace CentroEventos.Aplicacion.UseCases.Reservas
             validador.Validar(datosReserva);
             if (repoReserva.BuscarPorId(datosReserva.Id) != null)
                 throw new OperacionInvalidaException("Ya existe una reserva con el mismo ID.");
+            if (repoReserva.BuscarPersonaPorReserva(datosReserva.PersonaId))
+                throw new DuplicadoException("Ya existe una reserva asociada a esta persona.");
             repoReserva.Agregar(datosReserva);
             repoReserva.GuardarCambios();
         }

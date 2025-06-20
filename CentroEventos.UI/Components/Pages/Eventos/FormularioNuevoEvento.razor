@@ -1,8 +1,6 @@
 
 @namespace CentroEventos.UI.Components.Pages.Eventos
 @using System.ComponentModel.DataAnnotations
-@using CentroEventos.Aplicacion.UseCases.Evento
-@using CentroEventos.Aplicacion.Entities
 @inherits Microsoft.AspNetCore.Components.ComponentBase
 
 <MudForm @ref="_form" Model="_modelo">
@@ -10,61 +8,55 @@
     <MudGrid Spacing="3">
         <MudItem xs="12">
             <MudTextField T="string" @bind-Value="_modelo.Nombre" Label="Nombre del Evento" Required="true"
-                        RequiredError="El nombre es requerido" Variant="Variant.Outlined"
-                        Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Event"
-                        AdornmentColor="Color.Primary" />
+                          RequiredError="El nombre es requerido" Variant="Variant.Outlined"
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Event"
+                          AdornmentColor="Color.Primary"/>
         </MudItem>
 
         <MudItem xs="12">
             <MudTextField T="string" @bind-Value="_modelo.Descripcion" Label="Descripción" Required="true"
-                        RequiredError="La descripción es requerida" Variant="Variant.Outlined"
-                        Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Description"
-                        AdornmentColor="Color.Primary" />
+                          RequiredError="La descripción es requerida" Variant="Variant.Outlined"
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Description"
+                          AdornmentColor="Color.Primary"/>
         </MudItem>
 
         <MudItem xs="12" sm="6">
-            <MudDatePicker T="DateTime" Date="_modelo.FechaInicio" DateChanged="@(date => _modelo.FechaInicio = date ?? DateTime.Today)" Label="Fecha de Inicio" Required="true"
-                                    RequiredError="La fecha es requerida" Variant="Variant.Outlined"
-                                    Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.CalendarToday"
-                                    AdornmentColor="Color.Primary" />
+            <MudDatePicker T="DateTime" Date="_modelo.FechaInicio"
+                           DateChanged="@(date => _modelo.FechaInicio = date ?? DateTime.Today)" Label="Fecha de Inicio"
+                           Required="true"
+                           RequiredError="La fecha es requerida" Variant="Variant.Outlined"
+                           Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.CalendarToday"
+                           AdornmentColor="Color.Primary"/>
         </MudItem>
         <MudItem xs="12" sm="6">
             <MudTextField T="double" @bind-Value="_modelo.Duracion" Label="Duracion del Evento" Required="true"
-                        RequiredError="Debe indicar la duracion del Evento" Variant="Variant.Outlined"
-                        Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Groups"
-                        AdornmentColor="Color.Primary" />
+                          RequiredError="Debe indicar la duracion del Evento" Variant="Variant.Outlined"
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Groups"
+                          AdornmentColor="Color.Primary"/>
         </MudItem>
 
         <MudItem xs="12" sm="6">
             <MudTextField T="int" @bind-Value="_modelo.MaximoCupos" Label="Máximo de Cupos" Required="true"
-                        RequiredError="Debe indicar el máximo de cupos" Variant="Variant.Outlined"
-                        Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Groups"
-                        AdornmentColor="Color.Primary" />
+                          RequiredError="Debe indicar el máximo de cupos" Variant="Variant.Outlined"
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Groups"
+                          AdornmentColor="Color.Primary"/>
         </MudItem>
 
         <MudItem xs="12">
             <MudTextField T="string" @bind-Value="_modelo.DniResponsable" Label="DNI del Responsable" Required="true"
-                        RequiredError="Debe ingresar un DNI válido" Variant="Variant.Outlined"
-                        Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Badge"
-                        AdornmentColor="Color.Primary" />
+                          RequiredError="Debe ingresar un DNI válido" Variant="Variant.Outlined"
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Badge"
+                          AdornmentColor="Color.Primary"/>
         </MudItem>
 
         <MudItem xs="12">
             <MudButton Variant="Variant.Filled"
-                    Color="Color.Primary"
-                    FullWidth="true"
-                    Size="Size.Large"
-                    OnClick="ProcesarFormulario"
-                    Disabled="_procesando"
-                    Class="mt-4 py-2">
-                @if (_procesando)
-                {
-                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2"/>
-                }
-                else
-                {
-                    @("Crear Evento")
-                }
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       Size="Size.Large"
+                       OnClick="ProcesarFormulario"
+                       Class="mt-4 py-2">
+                Crear evento
             </MudButton>
         </MudItem>
     </MudGrid>
@@ -74,7 +66,6 @@
     [Parameter] public EventCallback<(string nombre, string description, DateTime fechaHoraInicio, double durationHoras, int cupoMaximo, string responsableDni)> OnGuardar { get; set; }
     [Parameter] public EventCallback<string> OnError { get; set; }
     private MudForm? _form;
-    private bool _procesando;
     private readonly FormularioEventoModel _modelo = new();
 
     private async Task ProcesarFormulario()
@@ -88,42 +79,37 @@
 
         try
         {
-            _procesando = true;
-
             await OnGuardar.InvokeAsync((_modelo.Nombre, _modelo.Descripcion, _modelo.FechaInicio, _modelo.Duracion, _modelo.MaximoCupos, _modelo.DniResponsable));
         }
         catch (Exception ex)
         {
             await OnError.InvokeAsync(ex.Message);
         }
-        finally
-        {
-            _procesando = false;
-        }
     }
 
     private class FormularioEventoModel
     {
         [Required(ErrorMessage = "El nombre es requerido")]
-    public string Nombre { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "La descripción es requerida")]
-    public string Descripcion { get; set; } = string.Empty;
+        [Required(ErrorMessage = "La descripción es requerida")]
+        public string Descripcion { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "La fecha de inicio es requerida")]
-    public DateTime FechaInicio { get; set; } = DateTime.Today;
+        [Required(ErrorMessage = "La fecha de inicio es requerida")]
+        public DateTime FechaInicio { get; set; } = DateTime.Today;
 
-    [Required(ErrorMessage = "La duración es requerida")]
-    [Range(1, double.MaxValue, ErrorMessage = "La duración debe ser un número positivo")]
-    public double Duracion { get; set; }
+        [Required(ErrorMessage = "La duración es requerida")]
+        [Range(1, double.MaxValue, ErrorMessage = "La duración debe ser un número positivo")]
+        public double Duracion { get; set; }
 
-    [Required(ErrorMessage = "Debe indicar el máximo de cupos")]
-    [Range(1, int.MaxValue, ErrorMessage = "El número de cupos debe ser mayor a cero")]
-    public int MaximoCupos { get; set; }
+        [Required(ErrorMessage = "Debe indicar el máximo de cupos")]
+        [Range(1, int.MaxValue, ErrorMessage = "El número de cupos debe ser mayor a cero")]
+        public int MaximoCupos { get; set; }
 
-    [Required(ErrorMessage = "El DNI del responsable es requerido")]
-    [StringLength(20, MinimumLength = 5, ErrorMessage = "El DNI debe tener entre 5 y 20 caracteres")]
-    [RegularExpression(@"^[A-Za-z0-9-]*$", ErrorMessage = "El DNI solo puede contener letras, números y guiones")]
-    public string DniResponsable { get; set; } = string.Empty;
+        [Required(ErrorMessage = "El DNI del responsable es requerido")]
+        [StringLength(20, MinimumLength = 5, ErrorMessage = "El DNI debe tener entre 5 y 20 caracteres")]
+        [RegularExpression(@"^[A-Za-z0-9-]*$", ErrorMessage = "El DNI solo puede contener letras, números y guiones")]
+        public string DniResponsable { get; set; } = string.Empty;
     }
+
 }

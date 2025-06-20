@@ -12,6 +12,8 @@ namespace CentroEventos.Aplicacion.UseCases.Personas
             ValidadorPersona.Validar(persona);
             if (repo.ExisteDni(persona.Dni))
                 throw new DuplicadoException("Ya existe una persona con el mismo DNI.");
+            if (repo.ObtenerPorEmail(persona.Email))
+                throw new DuplicadoException("Ya existe una persona con el mismo email.");
             repo.Agregar(persona);
             repo.GuardarCambios();
         }

@@ -20,11 +20,51 @@
         <MudText Typo="Typo.h4" Color="Color.Primary" Align="Align.Center" Class="mb-4 font-weight-bold">
             <MudIcon Icon="@Icons.Material.Filled.Edit" Class="me-2"/>Editar Reserva
         </MudText>
-            <FormularioNuevaReserva 
-                OnGuardar="GuardarCambios" 
-                OnError="ManejarError"
-                @key="_reserva.Id"
-                />
+            <MudForm @ref="_form">
+                <MudGrid Spacing="3">
+                    <MudItem xs="12">
+                        <MudTextField T="string" @bind-Value="_nombreEvento" Label="Nombre del Evento" Required="true"
+                            RequiredError="El nombre del evento es requerido" Variant="Variant.Outlined"
+                            Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Event"
+                            AdornmentColor="Color.Primary" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudDatePicker T="DateTime" Date="_fechaAltaReserva" DateChanged="@(date => _fechaAltaReserva = date ?? DateTime.Today)" 
+                            Label="Fecha de Reserva" Required="true"
+                            RequiredError="La fecha de reserva es requerida" Variant="Variant.Outlined"
+                            Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.CalendarToday"
+                            AdornmentColor="Color.Primary" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="Estado" @bind-Value="_estadoAsistencia" Label="Estado Asistencia" Required="true"
+                            RequiredError="El estado de asistencia es requerido" Variant="Variant.Outlined"
+                            Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.CheckCircle"
+                            AdornmentColor="Color.Primary">
+                            @foreach (var estado in Enum.GetValues<Estado>())
+                            {
+                                <MudSelectItem Value="@estado">@estado.ToString()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField T="string" @bind-Value="_dniResponsable" Label="DNI del Responsable" Required="true"
+                            RequiredError="Debe ingresar un DNI válido" Variant="Variant.Outlined"
+                            Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Badge"
+                            AdornmentColor="Color.Primary" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudButton Variant="Variant.Filled"
+                            Color="Color.Primary"
+                            FullWidth="true"
+                            Size="Size.Large"
+                            OnClick="GuardarCambios"
+                            StartIcon="@Icons.Material.Filled.Save"
+                            Class="mt-4 py-2">
+                            Guardar cambios
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudForm>
             <div class="d-flex justify-space-between mt-6">
                 <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Cancelar" StartIcon="@Icons.Material.Filled.ArrowBack">
                     Cancelar
@@ -35,8 +75,14 @@
 
 @code {
     [Parameter] public Guid Id { get; set; }
-    private Reserva _reserva = null!;
+    private MudForm? _form;
 
+    private string _nombreEvento = string.Empty;
+    private DateTime _fechaAltaReserva = DateTime.Today;
+    private Estado _estadoAsistencia = Estado.Pendiente;
+    private string _dniResponsable = string.Empty;
+    private Reserva _reserva = null!;
+    
     protected override void OnInitialized()
     {
         var usuarioLogueado = UsuarioLogueado.UsuarioActual;
@@ -48,6 +94,12 @@
         try
         {
             _reserva = RepositorioReserva.BuscarPorId(Id)!;
+            var persona = RepositorioPersona.BuscarPorId(_reserva.PersonaId);
+            var evento = RepositorioEvento.BuscarPorId(_reserva.EventoDeportivoId);
+            _nombreEvento = evento?.Nombre ?? "";
+            _fechaAltaReserva = _reserva.FechaAltaReserva;
+            _estadoAsistencia = _reserva.EstadoAsistencia;
+            _dniResponsable = persona?.Dni ?? "";
         }
         catch (Exception ex)
         {
@@ -56,17 +108,24 @@
         }
     }
 
-    private async Task GuardarCambios((string nombreEvento, DateTime fechaAltaReserva, Estado estadoAsistencia, string responsableDni) datos)
+    private async Task GuardarCambios()
     {
+        if (_form != null)
+        {
+            await _form.Validate();
+            if (!_form.IsValid) 
+                return;
+        }
         try
         {
-            var persona = RepositorioPersona.ObtenerPorDocumento(datos.responsableDni) ?? throw new EntidadNotFoundException("No se encontró la persona responsable.");
-            var evento = RepositorioEvento.BuscarPorNombre(datos.nombreEvento) ?? throw new EntidadNotFoundException("No se encontró el evento.");
+            var persona = RepositorioPersona.ObtenerPorDocumento(_dniResponsable) ?? throw new EntidadNotFoundException("No se encontró la persona responsable.");
+            var evento = RepositorioEvento.BuscarPorNombre(_nombreEvento) ?? throw new EntidadNotFoundException("No se encontró el evento.");
 
-            _reserva.PersonaId = persona.Id;
+            _reserva.EstadoAsistencia = _estadoAsistencia;
             _reserva.EventoDeportivoId = evento.Id;
-            _reserva.FechaAltaReserva = datos.fechaAltaReserva;
-            _reserva.EstadoAsistencia = datos.estadoAsistencia;
+            _reserva.FechaAltaReserva = _fechaAltaReserva;
+            _reserva.PersonaId = persona.Id;
+            
             await Task.Run(() =>
             {
                 if (UsuarioLogueado.UsuarioActual != null) ModificarReservaUseCase.Ejecutar(_reserva, UsuarioLogueado.UsuarioActual.Id);
@@ -79,12 +138,10 @@
             ManejarError(ex.Message);
         }
     }
-
     private void ManejarError(string mensaje)
     {
         Snackbar.Add(mensaje, Severity.Error);
     }
-
     private void Cancelar()
     {
         Navigation.NavigateTo("/reservas/listar");
